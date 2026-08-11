@@ -56,6 +56,25 @@ describe('ChatCompletionsClient', () => {
     expect(message.length).toBeLessThan(600);
   });
 
+  it('redacts the configured API key from network exception details', async () => {
+    const secret = 'network-secret-that-must-not-leak';
+    const client = new ChatCompletionsClient(
+      { ...configuration, apiKey: secret },
+      async () => { throw new Error(`socket failed with ${secret}`); },
+    );
+
+    let thrown: unknown;
+    try {
+      await client.complete(prompt);
+    } catch (error) {
+      thrown = error;
+    }
+
+    expect(thrown).toBeInstanceOf(ApiError);
+    expect((thrown as Error).message).toContain('[REDACTED]');
+    expect((thrown as Error).message).not.toContain(secret);
+  });
+
   it('rejects invalid configuration before invoking fetch', () => {
     let fetchCalls = 0;
 

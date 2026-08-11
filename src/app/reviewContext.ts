@@ -15,12 +15,16 @@ export interface ProcessResult {
 
 export type ProcessRunner = (command: string, args: string[], cwd: string) => Promise<ProcessResult>;
 
+export class ReviewContextError extends Error {
+  public readonly name = 'ReviewContextError';
+}
+
 export function collectSelectionRequest(context: EditorContext | undefined): ReviewRequest {
   if (!context) {
-    throw new Error('Open a file and select code to review.');
+    throw new ReviewContextError('Open a file and select code to review.');
   }
   if (!context.selectionText.trim()) {
-    throw new Error('Select some code to review.');
+    throw new ReviewContextError('Select some code to review.');
   }
   return {
     mode: 'selection',
@@ -32,10 +36,10 @@ export function collectSelectionRequest(context: EditorContext | undefined): Rev
 
 export function collectFileRequest(context: EditorContext | undefined): ReviewRequest {
   if (!context) {
-    throw new Error('Open a file to review.');
+    throw new ReviewContextError('Open a file to review.');
   }
   if (!context.documentText.trim()) {
-    throw new Error('The current file is empty.');
+    throw new ReviewContextError('The current file is empty.');
   }
   return {
     mode: 'file',
@@ -47,7 +51,7 @@ export function collectFileRequest(context: EditorContext | undefined): ReviewRe
 
 function gitFailure(kind: 'unstaged' | 'staged', result: ProcessResult): Error {
   const detail = result.stderr.trim() || `Git exited with code ${result.exitCode}.`;
-  return new Error(`Unable to collect ${kind} Git diff: ${detail}`);
+  return new ReviewContextError(`Unable to collect ${kind} Git diff: ${detail}`);
 }
 
 function withoutTrailingLineEndings(text: string): string {
@@ -59,7 +63,7 @@ export async function collectGitDiffRequest(
   runProcess: ProcessRunner,
 ): Promise<ReviewRequest> {
   if (!workspaceRoot) {
-    throw new Error('Open a workspace to review its Git diff.');
+    throw new ReviewContextError('Open a workspace to review its Git diff.');
   }
 
   const unstaged = await runProcess('git', ['diff', '--no-ext-diff'], workspaceRoot);
@@ -79,7 +83,7 @@ export async function collectGitDiffRequest(
     sections.push(`### Staged changes\n${withoutTrailingLineEndings(staged.stdout)}`);
   }
   if (!sections.length) {
-    throw new Error('There are no staged or unstaged changes to review.');
+    throw new ReviewContextError('There are no staged or unstaged changes to review.');
   }
   return { mode: 'diff', content: sections.join('\n\n') };
 }

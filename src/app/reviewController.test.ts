@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { ReviewMode, ReviewRequest, ReviewRunResult } from '../core/types';
+import { ApiError, ConfigurationError } from '../core/errors';
+import { collectSelectionRequest } from './reviewContext';
 import { ReviewController } from './reviewController';
+import { buildReviewTree } from './treeModel';
 import { ReviewStore } from './reviewStore';
 
 const request = (mode: ReviewMode): ReviewRequest => ({ mode, content: 'content' });
@@ -70,7 +73,7 @@ describe('ReviewController', () => {
     const store = new ReviewStore();
     const controller = new ReviewController({
       collect: async (mode) => request(mode),
-      review: async () => { throw Object.assign(new Error('API key is required.'), { code: 'configuration' }); },
+      review: async () => { throw new ConfigurationError('API key is required.'); },
       store,
       reportError: (message) => messages.push(message),
       offerConfiguration: () => { guidance += 1; },
@@ -92,16 +95,55 @@ describe('ReviewController', () => {
     expect(messages).toEqual(['Run a review before refreshing results.']);
   });
 
-  it('never writes exception details to the output log', async () => {
+  it('keeps validation errors actionable for the user', async () => {
+    const messages: string[] = [];
+    const controller = new ReviewController({
+      collect: async () => collectSelectionRequest(undefined),
+      review: async ({ mode }) => result(mode),
+      store: new ReviewStore(),
+      reportError: (message) => messages.push(message),
+    });
+    await controller.run('selection');
+    expect(messages).toEqual(['Open a file and select code to review.']);
+  });
+
+  it('summarizes API failures without trusting their exception text', async () => {
     const logs: string[] = [];
+    const store = new ReviewStore();
+    const controller = new ReviewController({
+      collect: async (mode) => request(mode),
+      review: async () => { throw new ApiError('Network request failed with sk-secret-value', 502); },
+      store,
+      log: (message) => logs.push(message),
+    });
+    await controller.run('file');
+    expect(store.getState()).toMatchObject({
+      status: 'error', message: 'Review failed. See the Review Pilot output for details.',
+    });
+    expect(logs).toEqual([
+      'Started file review.',
+      'Review API request failed (HTTP 502).',
+    ]);
+  });
+
+  it('never exposes arbitrary exception details in output, state, notifications, or the tree', async () => {
+    const logs: string[] = [];
+    const messages: string[] = [];
+    const store = new ReviewStore();
     const controller = new ReviewController({
       collect: async (mode) => request(mode),
       review: async () => { throw new Error('request contained sk-secret-value'); },
-      store: new ReviewStore(),
+      store,
+      reportError: (message) => messages.push(message),
       log: (message) => logs.push(message),
     });
 
     await controller.run('file');
     expect(logs).toEqual(['Started file review.', 'Review failed.']);
+    expect(messages).toEqual(['Review failed. See the Review Pilot output for details.']);
+    expect(store.getState()).toEqual({
+      status: 'error', message: 'Review failed. See the Review Pilot output for details.', lastTarget: 'file',
+    });
+    expect(buildReviewTree(store.getState())[0].description).not.toContain('sk-secret-value');
   });
 });

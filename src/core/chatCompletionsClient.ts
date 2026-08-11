@@ -54,7 +54,7 @@ export class ChatCompletionsClient {
         throw new ApiError(`Review request timed out after ${this.configuration.timeoutMs}ms.`, undefined, error);
       }
       const detail = error instanceof Error ? error.message : String(error);
-      throw new ApiError(`Network request failed: ${detail}`, undefined, error);
+      throw new ApiError(`Network request failed: ${this.sanitizeErrorDetail(detail)}`, undefined, error);
     } finally {
       this.clock.clearTimeout(timeout);
     }

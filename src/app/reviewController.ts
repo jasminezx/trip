@@ -1,4 +1,6 @@
 import type { ReviewMode, ReviewRequest, ReviewRunResult } from '../core/types';
+import { ApiError, ConfigurationError, ResponseError } from '../core/errors';
+import { ReviewContextError } from './reviewContext';
 import type { ReviewStore } from './reviewStore';
 
 export interface ReviewControllerDependencies {
@@ -11,8 +13,24 @@ export interface ReviewControllerDependencies {
   log?(message: string): void;
 }
 
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
+const GENERIC_REVIEW_ERROR = 'Review failed. See the Review Pilot output for details.';
+
+function safeErrorMessage(error: unknown): string {
+  return error instanceof ConfigurationError || error instanceof ResponseError || error instanceof ReviewContextError
+    ? error.message
+    : GENERIC_REVIEW_ERROR;
+}
+
+function safeErrorDetail(error: unknown): string | undefined {
+  if (error instanceof ApiError) {
+    return error.status === undefined
+      ? 'Review API request failed.'
+      : `Review API request failed (HTTP ${error.status}).`;
+  }
+  if (error instanceof ConfigurationError || error instanceof ResponseError || error instanceof ReviewContextError) {
+    return `Review failed: ${error.message}`;
+  }
+  return undefined;
 }
 
 function isConfigurationError(error: unknown): boolean {
@@ -39,10 +57,11 @@ export class ReviewController {
       this.dependencies.store.complete(result);
       this.dependencies.log?.(`Completed ${mode} review with ${result.issues.length} issue(s).`);
     } catch (error) {
-      const message = errorMessage(error);
+      const message = safeErrorMessage(error);
       this.dependencies.store.fail(message);
       this.dependencies.reportError?.(message);
-      this.dependencies.log?.('Review failed.');
+      const detail = safeErrorDetail(error);
+      this.dependencies.log?.(detail ?? 'Review failed.');
       if (isConfigurationError(error)) {
         this.dependencies.offerConfiguration?.();
       }

@@ -7,8 +7,9 @@ import {
   DEFAULT_BASE_URL, DEFAULT_LANGUAGE, DEFAULT_MAX_ISSUES, DEFAULT_MODEL, DEFAULT_TIMEOUT_MS, RESULTS_VIEW_ID,
 } from './core/constants';
 import { ReviewService } from './core/reviewService';
-import type { ReviewIssue, ReviewMode, ReviewRequest, ReviewRunResult } from './core/types';
+import type { ReviewMode, ReviewRequest, ReviewRunResult } from './core/types';
 import { collectReviewRequest } from './vscode/contextCollector';
+import { issueFromCommandArgument, suggestionFromCommandArgument } from './vscode/commandArguments';
 import { IssueNavigator } from './vscode/issueNavigator';
 import { ReviewTreeProvider } from './vscode/reviewTreeProvider';
 
@@ -71,8 +72,8 @@ export function activate(context: vscode.ExtensionContext): void {
   registerCommand(context, 'reviewPilot.reviewGitDiff', review('diff'));
   registerCommand(context, 'reviewPilot.refreshResults', () => controller.refresh());
   registerCommand(context, 'reviewPilot.openIssue', async (value: unknown) => {
-    const issue = value as ReviewIssue | undefined;
-    if (!issue?.id) {
+    const issue = issueFromCommandArgument(value);
+    if (!issue) {
       void vscode.window.showErrorMessage('Select a review issue to open.');
       return;
     }
@@ -83,12 +84,12 @@ export function activate(context: vscode.ExtensionContext): void {
     }
   });
   registerCommand(context, 'reviewPilot.copySuggestion', async (value: unknown) => {
-    const issue = value as ReviewIssue | undefined;
-    if (!issue?.suggestion.trim()) {
+    const suggestion = suggestionFromCommandArgument(value);
+    if (!suggestion) {
       void vscode.window.showInformationMessage('This issue does not include a suggestion.');
       return;
     }
-    await vscode.env.clipboard.writeText(issue.suggestion);
+    await vscode.env.clipboard.writeText(suggestion);
     void vscode.window.showInformationMessage('Review suggestion copied.');
   });
   registerCommand(context, 'reviewPilot.openSettings', () => (

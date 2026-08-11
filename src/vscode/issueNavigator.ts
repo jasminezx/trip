@@ -1,8 +1,10 @@
 import * as vscode from 'vscode';
+import { realpath } from 'node:fs/promises';
 import { issueLineRange, resolveIssueFile } from '../app/issueLocation';
 import type { ReviewIssue } from '../core/types';
 
 const HIGHLIGHT_DURATION_MS = 2_000;
+export type CanonicalPathResolver = (file: string) => Promise<string>;
 
 export class IssueNavigator implements vscode.Disposable {
   private readonly highlight = vscode.window.createTextEditorDecorationType({
@@ -12,17 +14,30 @@ export class IssueNavigator implements vscode.Disposable {
   private clearHighlightTimer: ReturnType<typeof setTimeout> | undefined;
   private highlightedEditor: vscode.TextEditor | undefined;
 
+  public constructor(private readonly canonicalizePath: CanonicalPathResolver = realpath) {}
+
   public async open(issue: ReviewIssue): Promise<void> {
-    const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const workspaceRoots = vscode.workspace.workspaceFolders?.map((folder) => folder.uri.fsPath) ?? [];
     const activeFile = vscode.window.activeTextEditor?.document.uri.scheme === 'file'
       ? vscode.window.activeTextEditor.document.uri.fsPath
       : undefined;
-    const file = resolveIssueFile(issue.file, workspaceRoot, activeFile);
+    const file = resolveIssueFile(issue.file, { workspaceRoots, activeFile });
     if (!file) {
       throw new Error('This issue does not include a file location.');
     }
 
-    const document = await vscode.workspace.openTextDocument(vscode.Uri.file(file));
+    const canonicalFile = await this.canonicalizePath(file);
+    const canonicalRoots = await Promise.all(workspaceRoots.map((root) => this.canonicalizePath(root)));
+    const canonicalActiveFile = activeFile ? await this.canonicalizePath(activeFile) : undefined;
+    const approvedFile = resolveIssueFile(canonicalFile, {
+      workspaceRoots: canonicalRoots,
+      activeFile: canonicalActiveFile,
+    });
+    if (!approvedFile) {
+      throw new Error('This issue does not include a file location.');
+    }
+
+    const document = await vscode.workspace.openTextDocument(vscode.Uri.file(approvedFile));
     const editor = await vscode.window.showTextDocument(document);
     const lines = issueLineRange(issue);
     const startLine = Math.min(lines.startLine, Math.max(0, document.lineCount - 1));
