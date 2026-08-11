@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { ApiError, ResponseError } from './errors';
+import { ApiError, ConfigurationError, ResponseError } from './errors';
 import { ChatCompletionsClient } from './chatCompletionsClient';
 
-const configuration = { apiKey: 'test-token', baseUrl: 'https://example.test', model: 'review-model', language: 'auto', maxIssues: 3, timeoutMs: 500 };
+const configuration = { apiKey: 'test-token', baseUrl: 'https://example.test', model: 'review-model', language: 'auto', maxIssues: 3, timeoutMs: 1_000 };
 const prompt = { system: 'System instruction', user: 'User content' };
 
 describe('ChatCompletionsClient', () => {
@@ -33,6 +33,37 @@ describe('ChatCompletionsClient', () => {
     const cause = new Error('socket closed');
     const networkClient = new ChatCompletionsClient(configuration, async () => { throw cause; });
     await expect(networkClient.complete(prompt)).rejects.toMatchObject({ cause });
+  });
+
+  it('redacts the configured API key and bounds untrusted HTTP error detail', async () => {
+    const secret = 'secret-that-must-not-leak';
+    const client = new ChatCompletionsClient(
+      { ...configuration, apiKey: secret },
+      async () => new Response(`${secret}\n${'x'.repeat(2_000)}`, { status: 502 }),
+    );
+
+    let thrown: unknown;
+    try {
+      await client.complete(prompt);
+    } catch (error) {
+      thrown = error;
+    }
+
+    expect(thrown).toBeInstanceOf(ApiError);
+    const message = (thrown as Error).message;
+    expect(message).not.toContain(secret);
+    expect(message).not.toContain('\n');
+    expect(message.length).toBeLessThan(600);
+  });
+
+  it('rejects invalid configuration before invoking fetch', () => {
+    let fetchCalls = 0;
+
+    expect(() => new ChatCompletionsClient(
+      { ...configuration, apiKey: '' },
+      async () => { fetchCalls += 1; return new Response(); },
+    )).toThrow(ConfigurationError);
+    expect(fetchCalls).toBe(0);
   });
 
   it('aborts the injected request when the configured timeout expires', async () => {

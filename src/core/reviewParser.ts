@@ -49,8 +49,8 @@ export function parseReviewResponse(raw: string, options: ReviewParseOptions): R
     throw new ResponseError('Model response was not valid JSON.');
   }
   const result = asRecord(parsed);
-  if (!result || !Array.isArray(result.issues)) {
-    throw new ResponseError('Model response must be an object with an issues array.');
+  if (!result || !Array.isArray(result.issues) || typeof result.summary !== 'string') {
+    throw new ResponseError('Model response must be an object with a summary string and an issues array.');
   }
   if (!Number.isInteger(options.maxIssues) || options.maxIssues < 1) {
     throw new ResponseError('Maximum issues must be a positive integer.');
@@ -75,6 +75,5 @@ export function parseReviewResponse(raw: string, options: ReviewParseOptions): R
         endLine,
       });
     });
-  const summary = valueText(result.summary);
-  return summary ? { summary, issues } : { issues };
+  return { summary: result.summary.trim(), issues };
 }

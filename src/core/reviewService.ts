@@ -1,3 +1,4 @@
+import { validateMaxIssues } from './aiConfig';
 import { buildReviewPrompt } from './reviewPrompt';
 import { parseReviewResponse } from './reviewParser';
 import type { ReviewRequest, ReviewRunResult } from './types';
@@ -13,9 +14,10 @@ export class ReviewService {
   ) {}
 
   public async review(request: ReviewRequest, options: { maxIssues: number }): Promise<ReviewRunResult> {
-    const prompt = buildReviewPrompt(request, options.maxIssues);
+    const maxIssues = validateMaxIssues(options.maxIssues);
+    const prompt = buildReviewPrompt(request, maxIssues);
     const raw = await this.client.complete(prompt);
-    const result = parseReviewResponse(raw, { defaultFile: request.filePath, maxIssues: options.maxIssues });
+    const result = parseReviewResponse(raw, { defaultFile: request.filePath, maxIssues });
     return {
       ...result,
       metadata: { mode: request.mode, reviewedAt: this.now().toISOString(), issueCount: result.issues.length },

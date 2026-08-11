@@ -1,4 +1,4 @@
-import { resolveChatCompletionsEndpoint, type AiConfiguration } from './aiConfig';
+import { resolveChatCompletionsEndpoint, validateAiConfiguration, type AiConfiguration } from './aiConfig';
 import { ApiError, ResponseError } from './errors';
 import type { ReviewPrompt } from './reviewPrompt';
 
@@ -10,13 +10,18 @@ export interface Clock {
 }
 
 const systemClock: Clock = { setTimeout, clearTimeout };
+const MAX_ERROR_DETAIL_LENGTH = 500;
 
 export class ChatCompletionsClient {
+  private readonly configuration: AiConfiguration;
+
   public constructor(
-    private readonly configuration: AiConfiguration,
+    configuration: AiConfiguration,
     private readonly fetch: FetchFunction = globalThis.fetch.bind(globalThis),
     private readonly clock: Clock = systemClock,
-  ) {}
+  ) {
+    this.configuration = validateAiConfiguration(configuration);
+  }
 
   public async complete(prompt: ReviewPrompt): Promise<string> {
     const controller = new AbortController();
@@ -66,7 +71,20 @@ export class ChatCompletionsClient {
     } catch {
       // Keep the response text when the error body is not JSON.
     }
-    return new ApiError(`Review API request failed (${response.status}): ${detail || response.statusText}`, response.status);
+    return new ApiError(
+      `Review API request failed (${response.status}): ${this.sanitizeErrorDetail(detail || response.statusText)}`,
+      response.status,
+    );
+  }
+
+  private sanitizeErrorDetail(detail: string): string {
+    const redacted = detail
+      .split(this.configuration.apiKey).join('[REDACTED]')
+      .replace(/[\u0000-\u001f\u007f\s]+/g, ' ')
+      .trim();
+    return redacted.length <= MAX_ERROR_DETAIL_LENGTH
+      ? redacted
+      : `${redacted.slice(0, MAX_ERROR_DETAIL_LENGTH - 1)}…`;
   }
 
   private async extractContent(response: Response): Promise<string> {

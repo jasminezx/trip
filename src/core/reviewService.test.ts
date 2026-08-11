@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { ConfigurationError } from './errors';
 import { ReviewService } from './reviewService';
 
 describe('ReviewService', () => {
@@ -17,5 +18,19 @@ describe('ReviewService', () => {
       issues: [{ file: 'src/total.ts', severity: 'high' }],
       metadata: { mode: 'selection', reviewedAt: '2026-08-11T04:00:00.000Z', issueCount: 1 },
     });
+  });
+
+  it('rejects invalid maxIssues before invoking the completion client', async () => {
+    let completions = 0;
+    const service = new ReviewService({ complete: async () => {
+      completions += 1;
+      return '{"summary":"No issues", "issues":[]}';
+    } });
+
+    await expect(service.review(
+      { mode: 'file', content: 'const valid = true;', filePath: 'src/valid.ts' },
+      { maxIssues: 0 },
+    )).rejects.toBeInstanceOf(ConfigurationError);
+    expect(completions).toBe(0);
   });
 });

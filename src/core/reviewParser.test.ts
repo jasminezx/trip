@@ -21,12 +21,20 @@ describe('parseReviewResponse', () => {
   it('rejects malformed top-level output and limits the returned issues', () => {
     expect(() => parseReviewResponse('[]', { maxIssues: 2 })).toThrow(ResponseError);
 
-    const result = parseReviewResponse(JSON.stringify({ issues: [
+    const result = parseReviewResponse(JSON.stringify({ summary: 'Three issues', issues: [
       { title: 'One', message: 'One', suggestion: 'Fix', file: 'a.ts', startLine: 1, endLine: 1 },
       { title: 'Two', message: 'Two', suggestion: 'Fix', file: 'a.ts', startLine: 2, endLine: 2 },
       { title: 'Three', message: 'Three', suggestion: 'Fix', file: 'a.ts', startLine: 3, endLine: 3 },
     ] }), { maxIssues: 2 });
 
     expect(result.issues.map((issue) => issue.title)).toEqual(['One', 'Two']);
+  });
+
+  it.each([
+    ['missing', { issues: [] }],
+    ['null', { summary: null, issues: [] }],
+    ['non-string', { summary: 42, issues: [] }],
+  ])('rejects a %s summary', (_case, response) => {
+    expect(() => parseReviewResponse(JSON.stringify(response), { maxIssues: 2 })).toThrow(ResponseError);
   });
 });

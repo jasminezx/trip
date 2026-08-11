@@ -44,7 +44,7 @@ export interface ReviewRequest {
 
 export interface ReviewResult {
   issues: ReviewIssue[];
-  summary?: string;
+  summary: string;
 }
 
 export interface ReviewMetadata {

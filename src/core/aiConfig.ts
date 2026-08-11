@@ -10,6 +10,15 @@ export interface AiConfiguration {
   timeoutMs: number;
 }
 
+export function validateMaxIssues(maxIssues: number): number {
+  if (!Number.isInteger(maxIssues)
+    || maxIssues < MAX_ISSUES_RANGE.minimum
+    || maxIssues > MAX_ISSUES_RANGE.maximum) {
+    throw new ConfigurationError(`Maximum issues must be between ${MAX_ISSUES_RANGE.minimum} and ${MAX_ISSUES_RANGE.maximum}.`);
+  }
+  return maxIssues;
+}
+
 function required(value: string, name: string): string {
   const normalized = value.trim();
   if (!normalized) {
@@ -51,16 +60,12 @@ export function validateAiConfiguration(configuration: AiConfiguration): AiConfi
   const baseUrl = required(configuration.baseUrl, 'Base URL').replace(/\/+$/, '');
   resolveChatCompletionsEndpoint(baseUrl);
 
-  if (!Number.isInteger(configuration.maxIssues)
-    || configuration.maxIssues < MAX_ISSUES_RANGE.minimum
-    || configuration.maxIssues > MAX_ISSUES_RANGE.maximum) {
-    throw new ConfigurationError(`Maximum issues must be between ${MAX_ISSUES_RANGE.minimum} and ${MAX_ISSUES_RANGE.maximum}.`);
-  }
+  const maxIssues = validateMaxIssues(configuration.maxIssues);
   if (!Number.isInteger(configuration.timeoutMs)
     || configuration.timeoutMs < TIMEOUT_MS_RANGE.minimum
     || configuration.timeoutMs > TIMEOUT_MS_RANGE.maximum) {
     throw new ConfigurationError(`Timeout must be between ${TIMEOUT_MS_RANGE.minimum} and ${TIMEOUT_MS_RANGE.maximum} milliseconds.`);
   }
 
-  return { apiKey, baseUrl, model, language, maxIssues: configuration.maxIssues, timeoutMs: configuration.timeoutMs };
+  return { apiKey, baseUrl, model, language, maxIssues, timeoutMs: configuration.timeoutMs };
 }
