@@ -52,3 +52,22 @@ Inspection found no `.superpowers`, `docs`, `src`, tests, source maps,
   share TreeItem ids; and `reviewPilot.defaultMode` is declared but not consumed
   by named commands. The README documents the latter accurately rather than
   claiming unsupported behavior.
+
+## Fix Round 1: Marketplace metadata and icon
+
+- Added the approved Marketplace publisher, `maccura`, and top-level icon
+  metadata, `media/review-pilot.png`.
+- Deterministically rendered `media/review-pilot.png` from the existing SVG's
+  square-and-checkmark geometry at 256 by 256 pixels. The PNG uses a
+  high-contrast blue background and white strokes for Marketplace readability;
+  the existing SVG remains the Activity Bar icon.
+- Added the PNG to the restrictive `.vscodeignore` allow-list.
+
+| Check | Result |
+| --- | --- |
+| Local PNG inspection | Valid `89-50-4E-47-0D-0A-1A-0A` signature; 256 by 256 pixels; manually previewed for readability. |
+| `npm run build` | Passed. |
+| `npm run package` | Passed; regenerated `review-pilot-0.0.1.vsix` with 9 entries. |
+| VSIX manifest inspection | `Publisher="maccura"` and Marketplace icon reference present. |
+| Packaged manifest inspection | `icon` is `media/review-pilot.png`; icon archive entry exists. |
+| VSIX exclusion inspection | No forbidden `.superpowers`, docs, source, tests, source maps, local config, or development artifacts. |

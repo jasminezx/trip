@@ -4,7 +4,9 @@
   "description": "AI-assisted code review in Visual Studio Code.",
   "version": "0.0.1",
   "private": true,
+  "publisher": "maccura",
   "license": "MIT",
+  "icon": "media/review-pilot.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/jasminezx/trip.git"
