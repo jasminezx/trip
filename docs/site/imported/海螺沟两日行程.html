@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="温江至泸定、海螺沟的周末自驾行程手册。" />
+    <title>温江-泸定-海螺沟 周末自驾行程手册</title>
+    <style>
+      :root {
+        --forest: #123d35;
+        --pine: #1e5a4d;
+        --snow: #f7f7f2;
+        --paper: #fffefa;
+        --gold: #d6a446;
+        --ink: #17342f;
+        --muted: #5f6d68;
+        --line: #dfe7e1;
+        --shadow: 0 18px 45px rgba(18, 61, 53, 0.1);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--snow);
+        color: var(--ink);
+        font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+        line-height: 1.8;
+        overflow-x: hidden;
+      }
+      img {
+        display: block;
+        max-width: 100%;
+      }
+      a {
+        color: inherit;
+      }
+      .hero {
+        min-height: clamp(540px, 82vh, 780px);
+        position: relative;
+        display: grid;
+        place-items: center;
+        isolation: isolate;
+        color: #fff;
+        background: #173e37
+          url("./温江泸定海螺沟周末自驾行程手册_assets/hero-hailuogou.jpg")
+          center/cover no-repeat;
+        overflow: hidden;
+      }
+      .hero:before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background:
+          linear-gradient(
+            110deg,
+            rgba(5, 27, 24, 0.82),
+            rgba(9, 47, 42, 0.44) 48%,
+            rgba(9, 35, 32, 0.18)
+          ),
+          linear-gradient(0deg, rgba(5, 27, 24, 0.55), transparent 48%);
+      }
+      .hero:after {
+        content: "";
+        position: absolute;
+        inset: auto 0 0;
+        height: 180px;
+        background: linear-gradient(transparent, var(--snow));
+        z-index: -1;
+      }
+      .hero-inner {
+        width: min(1100px, calc(100% - 40px));
+        padding: 84px 0 150px;
+        text-align: center;
+        text-shadow: 0 3px 20px rgba(0, 0, 0, 0.45);
+      }
+      .eyebrow,
+      .route-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55em;
+        letter-spacing: 0.16em;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .eyebrow {
+        padding: 0.45rem 1.1rem;
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        border-radius: 999px;
+        background: rgba(9, 36, 31, 0.32);
+        backdrop-filter: blur(8px);
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      p {
+        margin-top: 0;
+      }
+      .hero h1 {
+        max-width: 900px;
+        margin: 18px auto 6px;
+        font-size: clamp(2.3rem, 6.5vw, 5rem);
+        line-height: 1.12;
+        letter-spacing: 0.07em;
+      }
+      .hero h2 {
+        margin: 0;
+        font-size: clamp(1rem, 2.3vw, 1.35rem);
+        font-weight: 500;
+        letter-spacing: 0.38em;
+      }
+      .hero-meta {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 35px;
+      }
+      .hero-meta div {
+        min-width: 145px;
+        padding: 12px 16px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 12px;
+        background: rgba(5, 27, 24, 0.35);
+        backdrop-filter: blur(10px);
+      }
+      .hero-meta small {
+        display: block;
+        opacity: 0.72;
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+      }
+      .hero-meta strong {
+        display: block;
+        font-size: 0.95rem;
+        line-height: 1.45;
+      }
+      main {
+        width: min(1100px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+      .section {
+        padding: 68px 0;
+      }
+      .section-title {
+        max-width: 720px;
+        margin: 0 auto 34px;
+        text-align: center;
+      }
+      .section-title .route-tag {
+        color: var(--gold);
+      }
+      .section-title h3 {
+        margin: 6px 0;
+        font-size: clamp(1.8rem, 4vw, 2.65rem);
+        line-height: 1.25;
+      }
+      .section-title p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .section-title:after {
+        content: "";
+        display: block;
+        width: 54px;
+        height: 3px;
+        margin: 18px auto 0;
+        background: var(--gold);
+      }
+      .overview {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .route-card,
+      .day,
+      .hotel,
+      .food-card,
+      .tip-card,
+      .route-map {
+        background: var(--paper);
+        border: 1px solid rgba(18, 61, 53, 0.07);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+      }
+      .route-card {
+        padding: 27px;
+      }
+      .route-card h4 {
+        margin: 10px 0 6px;
+        font-size: 1.15rem;
+        line-height: 1.55;
+      }
+      .route-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+      .route-card .route-tag {
+        color: var(--pine);
+        font-size: 0.74rem;
+      }
+      .day {
+        padding: clamp(20px, 4vw, 44px);
+        margin-top: 30px;
+      }
+      .day-header {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        padding-bottom: 25px;
+        margin-bottom: 28px;
+        border-bottom: 1px solid var(--line);
+      }
+      .day-no {
+        width: 64px;
+        height: 64px;
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        border-radius: 16px;
+        background: linear-gradient(145deg, var(--forest), var(--pine));
+        color: #fff;
+        font-size: 1.65rem;
+        font-weight: 800;
+        box-shadow: 0 10px 22px rgba(18, 61, 53, 0.23);
+      }
+      .day-header h3 {
+        margin: 0;
+        font-size: clamp(1.35rem, 3vw, 2rem);
+        line-height: 1.35;
+      }
+      .day-header p {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+      .timeline {
+        position: relative;
+        padding-left: 28px;
+      }
+      .timeline:before {
+        content: "";
+        position: absolute;
+        left: 7px;
+        top: 5px;
+        bottom: 34px;
+        width: 2px;
+        background: linear-gradient(var(--pine), #b6d6cb);
+      }
+      .stop {
+        position: relative;
+        padding-bottom: 31px;
+      }
+      .stop:before {
+        content: "";
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        left: -27px;
+        top: 10px;
+        border: 3px solid var(--paper);
+        border-radius: 50%;
+        background: var(--pine);
+        box-shadow: 0 0 0 2px var(--pine);
+      }
+      .stop:last-child {
+        padding-bottom: 0;
+      }
+      .time {
+        display: inline-block;
+        margin-bottom: 7px;
+        padding: 2px 10px;
+        border-radius: 999px;
+        background: #e9f4ef;
+        color: var(--forest);
+        font-size: 0.79rem;
+        font-weight: 700;
+      }
+      .stop h4 {
+        margin: 0 0 4px;
+        font-size: 1.12rem;
+        line-height: 1.55;
+      }
+      .stop > p {
+        margin: 0;
+        color: #43544f;
+        font-size: 0.95rem;
+      }
+      .tip {
+        margin-top: 12px;
+        padding: 10px 13px;
+        border-left: 3px solid var(--gold);
+        border-radius: 0 10px 10px 0;
+        background: #fff7e5;
+        color: #725515;
+        font-size: 0.89rem;
+      }
+      figure.spot-image {
+        margin: 16px 0 0;
+        border-radius: 15px;
+        overflow: hidden;
+        background: #d9e4de;
+        box-shadow: 0 12px 28px rgba(14, 47, 41, 0.13);
+      }
+      .spot-image img {
+        width: 100%;
+        height: clamp(205px, 32vw, 310px);
+        object-fit: cover;
+      }
+      .spot-image figcaption {
+        padding: 13px 17px;
+        background: var(--forest);
+        color: #fff;
+      }
+      .spot-image h5 {
+        margin: 0 0 2px;
+        font-size: 1rem;
+      }
+      .spot-image p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 0.8rem;
+        line-height: 1.65;
+      }
+      .caption-note {
+        color: #ffe4a1;
+      }
+      .hotel {
+        display: grid;
+        grid-template-columns: minmax(200px, 0.7fr) 1.3fr;
+        overflow: hidden;
+      }
+      .hotel img {
+        width: 100%;
+        height: 100%;
+        min-height: 280px;
+        object-fit: cover;
+      }
+      .hotel-copy {
+        padding: 30px;
+        background: linear-gradient(135deg, #113b33, #246454);
+        color: #fff;
+      }
+      .hotel-copy h3 {
+        margin: 0 0 10px;
+        font-size: 1.45rem;
+      }
+      .hotel-copy p {
+        margin: 4px 0;
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 0.93rem;
+      }
+      .rating {
+        display: inline-block;
+        margin-top: 12px;
+        padding: 3px 11px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.17);
+        font-size: 0.85rem;
+      }
+      .food-grid,
+      .tips-grid {
+        display: grid;
+        gap: 18px;
+      }
+      .food-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .food-card {
+        overflow: hidden;
+      }
+      .food-icon {
+        display: grid;
+        place-items: center;
+        height: 115px;
+        background: linear-gradient(135deg, #e9dcc4, #efd2a5);
+        font-size: 2.55rem;
+      }
+      .food-card:nth-child(2) .food-icon {
+        background: linear-gradient(135deg, #ecd2c9, #dfb8a7);
+      }
+      .food-card:nth-child(3) .food-icon {
+        background: linear-gradient(135deg, #d4e6d7, #b8d8bf);
+      }
+      .food-copy {
+        padding: 20px;
+      }
+      .food-copy h5 {
+        margin-bottom: 5px;
+        font-size: 1.05rem;
+      }
+      .food-copy p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.89rem;
+      }
+      .dish {
+        display: inline-block;
+        margin: 10px 4px 0 0;
+        padding: 2px 9px;
+        border-radius: 99px;
+        background: #e8f4ef;
+        color: var(--forest);
+        font-size: 0.74rem;
+      }
+      .route-map {
+        padding: clamp(22px, 4vw, 38px);
+        background: linear-gradient(140deg, #fffefa, #eff7f1);
+      }
+      .map-route {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .map-point {
+        flex: 1;
+        min-width: 86px;
+        text-align: center;
+      }
+      .map-point b {
+        display: grid;
+        place-items: center;
+        width: 54px;
+        height: 54px;
+        margin: 0 auto 8px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, var(--forest), var(--pine));
+        color: #fff;
+        font-size: 1.2rem;
+        box-shadow: 0 6px 14px rgba(18, 61, 53, 0.2);
+      }
+      .map-point span {
+        display: block;
+        font-weight: 700;
+        font-size: 0.86rem;
+        line-height: 1.4;
+      }
+      .map-point small {
+        display: block;
+        color: var(--muted);
+        font-size: 0.73rem;
+      }
+      .arrow {
+        color: var(--gold);
+        font-size: 1.3rem;
+        font-weight: 900;
+      }
+      .tips-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .tip-card {
+        padding: 22px;
+        border-top: 4px solid var(--pine);
+      }
+      .tip-card i {
+        font-style: normal;
+        font-size: 1.65rem;
+      }
+      .tip-card h5 {
+        margin: 6px 0;
+        font-size: 1rem;
+      }
+      .tip-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.87rem;
+      }
+      footer {
+        padding: 48px 20px;
+        background: #0e3029;
+        color: #fff;
+        text-align: center;
+      }
+      footer p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.9rem;
+      }
+      footer p + p {
+        margin-top: 8px;
+        font-size: 0.78rem;
+      }
+      footer a {
+        color: #f5cf79;
+        text-underline-offset: 3px;
+      }
+      .heart {
+        color: #e67b6b;
+      }
+      @media (max-width: 760px) {
+        .hero-inner {
+          padding-bottom: 120px;
+        }
+        .hero h2 {
+          letter-spacing: 0.23em;
+        }
+        .overview,
+        .hotel {
+          grid-template-columns: 1fr;
+        }
+        .hotel img {
+          height: 220px;
+          min-height: 0;
+        }
+        .food-grid,
+        .tips-grid {
+          grid-template-columns: 1fr;
+        }
+        .map-route {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .map-point {
+          min-width: 0;
+        }
+        .arrow {
+          display: none;
+        }
+        .section {
+          padding: 45px 0;
+        }
+        .hero-meta div {
+          min-width: calc(50% - 6px);
+        }
+        .timeline {
+          padding-left: 25px;
+        }
+        .stop:before {
+          left: -24px;
+        }
+        .day-header {
+          align-items: flex-start;
+        }
+        .day-no {
+          width: 52px;
+          height: 52px;
+          border-radius: 13px;
+          font-size: 1.35rem;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *:before,
+        *:after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+      @media print {
+        body {
+          background: #fff;
+          color: #111;
+          font-size: 10pt;
+        }
+        .hero {
+          min-height: 250px;
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+        }
+        .hero-inner {
+          padding: 45px 0;
+        }
+        .section {
+          padding: 20px 0;
+        }
+        .day,
+        .route-card,
+        .hotel,
+        .food-card,
+        .tip-card,
+        .route-map {
+          box-shadow: none;
+          break-inside: avoid;
+        }
+        .spot-image img {
+          height: 180px;
+        }
+        footer {
+          padding: 16px;
+        }
+        .tip {
+          break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero-inner">
+        <div class="eyebrow">Weekend Trip 2026</div>
+        <h1>温江 → 泸定 → 海螺沟</h1>
+        <h2>雪山 · 温泉 · 采蘑菇</h2>
+        <div class="hero-meta" aria-label="行程摘要">
+          <div><small>出发地</small><strong>温江</strong></div>
+          <div><small>目的地</small><strong>海螺沟花水湾温泉酒店</strong></div>
+          <div><small>时间</small><strong>周六 - 周日</strong></div>
+          <div><small>返程路线</small><strong>燕子沟-雅家情海--\>康定--\>温江</strong></div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <section class="section" aria-labelledby="overview-title">
+        <div class="section-title">
+          <span class="route-tag">Route overview</span>
+          <h3 id="overview-title">路线概览</h3>
+          <p>去程走雅康高速，返程走康定</p>
+        </div>
+        <div class="overview">
+          <article class="route-card">
+            <span class="route-tag">去程 · 约3.5h</span>
+            <h4>温江 → 雅西高速 → 雅康高速 → 泸定 → 磨西镇</h4>
+            <p>
+              穿越二郎山隧道，沿途欣赏大渡河峡谷风光，抵达海螺沟花水湾温泉酒店。
+            </p>
+          </article>
+          <article class="route-card">
+            <span class="route-tag">返程 · 约4h</span>
+            <h4>磨西镇 → 燕子沟-雅家情海 → 康定 → 雅安 → 温江</h4>
+            <p>
+              沿康定返程，沿途牛羊，猴子，马，川西风光尽收眼底。
+            </p>
+          </article>
+        </div>
+      </section>
+      <section class="section" aria-labelledby="day1-title">
+        <article class="day">
+          <div class="day-header">
+            <div class="day-no" aria-label="第一天">1</div>
+            <div>
+              <h3 id="day1-title">Day 1 · 奔赴雪山与温泉</h3>
+              <p>温江出发 → 泸定桥 → 伞岗坪 → 海螺沟花水湾温泉酒店</p>
+            </div>
+          </div>
+          <div class="timeline">
+            <article class="stop">
+              <span class="time">08:30 - 09:00 出发</span>
+              <h4>温江出发，穿越二郎山</h4>
+              <p>
+                从温江上成温邛高速，经雅安、天全，穿越二郎山隧道（隧道内灯光秀很震撼，隧道外就是绝美峡谷风光）。出隧道后海拔逐渐升高，沿途是大渡河峡谷风光，天气好能看到云海。
+              </p>
+              <figure class="spot-image">
+                <img
+                  src="./温江泸定海螺沟周末自驾行程手册_assets/erlangshan.jpg"
+                  loading="lazy"
+                  alt="二郎山隧道东口及周边公路"
+                />
+                <figcaption>
+                  <h5>二郎山隧道 · 川藏第一隧</h5>
+                  <p>
+                    全长8600米，穿越海拔2170米的二郎山，隧道两侧气候迥异，被誉为“阴阳两重天”
+                  </p>
+                </figcaption>
+              </figure>
+            </article>
+            <article class="stop">
+              <span class="time">12:30 - 14:00 午餐</span>
+              <h4>李豆花饭店 · 地道川西味道</h4>
+              <p>
+                抵达泸定县城，导航“李豆花饭店”。这家藏在角落里的老字号，主打地道川菜，豆花必点，蘸水很香。还有凉拌牦牛肉和炒时蔬解腻。
+              </p>
+              <div class="tip">
+                💡 老店饭点人可能较多，上菜慢一点请耐心等待，味道绝对值得。
+              </div>
+            </article>
+            <article class="stop">
+              <span class="time">14:10 - 15:40 游玩</span>
+              <h4>飞夺泸定桥 · 感受铁索寒</h4>
+              <p>
+                吃完饭导航去“泸定桥景区”，停车建议停在飞夺泸定桥纪念馆地下停车场。走在13根铁链组成的桥上，脚下是奔腾的大渡河，非常震撼。过桥后走到西岸（观音阁一侧），是拍摄泸定桥全景的最佳机位。纪念馆免费，需身份证。
+              </p>
+              <figure class="spot-image">
+                <img
+                  src="./温江泸定海螺沟周末自驾行程手册_assets/luding-bridge.jpg"
+                  loading="lazy"
+                  alt="横跨大渡河的四川泸定桥"
+                />
+                <figcaption>
+                  <h5>泸定桥 · 全国重点文物保护单位</h5>
+                  <p>
+                    始建于清康熙四十四年（1705年），全长103.67米，由13根铁链组成，因“飞夺泸定桥”闻名中外
+                  </p>
+                </figcaption>
+              </figure>
+            </article>
+            <article class="stop">
+              <span class="time">15:50 - 16:30 打卡</span>
+              <h4>伞岗坪 · 川藏第一驿</h4>
+              <p>
+                导航“伞岗坪自驾营地”或“咱里村”，距离县城几分钟车程。这里是看兴康特大桥（网红大渡河大桥）最好的位置，桥就在头顶，非常壮观。有草坪、观景台，被称为“318最美起点”，适合拍一张“此生必驾”的打卡照。
+              </p>
+              <figure class="spot-image">
+                <img
+                  src="./温江泸定海螺沟周末自驾行程手册_assets/xingkang-bridge.jpg"
+                  loading="lazy"
+                  alt="跨越大渡河的兴康特大桥"
+                />
+                <figcaption>
+                  <h5>伞岗坪自驾营地 · 318最美起点</h5>
+                  <p>
+                    紧邻雅康高速兴康特大桥，可“上观桥、中赏花、下看湖”，有房车营地和观景栈道
+                  </p>
+                </figcaption>
+              </figure>
+            </article>
+            <article class="stop">
+              <span class="time">16:40 出发</span>
+              <h4>前往海螺沟（磨西镇）</h4>
+              <p>
+                车程约50-60分钟（约50公里）。抵达磨西镇后，先去酒店办理入住。磨西镇上有很多餐馆，推荐吃牦牛火锅或雅鱼。开心烧烤，牛肉汤锅很好吃，烤鸡味道也不错。
+              </p>
+            </article>
+            <article class="stop">
+              <span class="time">晚上 · 泡温泉 &amp; 休息</span>
+              <h4>硫磺温泉 · 枕星河入梦</h4>
+              <p>
+                酒店的特色是硫磺温泉，泡完皮肤很滑。如果天气好，晚上在酒店院子里有机会看到贡嘎雪山的星空，非常美。
+              </p>
+              <figure class="spot-image">
+                <img
+                  src="./温江泸定海螺沟周末自驾行程手册_assets/hot-spring.jpg"
+                  loading="lazy"
+                  alt="山林间温泉环境的气氛图"
+                />
+                <figcaption>
+                  <h5>温泉气氛图（非海螺沟实拍）</h5>
+                  <p>私汤房房间自带专属温泉泡池，水质优良，私密性极佳</p>
+                </figcaption>
+              </figure>
+            </article>
+          </div>
+        </article>
+      </section>
+      <section class="section" aria-labelledby="hotel-title">
+        <div class="hotel">
+          <img
+            src="./温江泸定海螺沟周末自驾行程手册_assets/gongga.jpg"
+            loading="lazy"
+            alt="贡嘎山及贡嘎山自然保护区山景"
+          />
+          <div class="hotel-copy">
+            <h3 id="hotel-title">海螺沟花水湾温泉酒店</h3>
+            <p>📍 四川省甘孜州泸定县磨西镇共和村二组50号</p>
+            <p>📞 18227489287 / 17323059735</p>
+            <p>🏔️ 主打私汤房和天然硫磺温泉，温泉水质很好，泡完皮肤滑溜</p>
+            <p>🅿️ 免费停车场 | 🛁 免费温泉 | 🏊 室外泳池 | 🍵 茶室</p>
+            <span class="rating">⭐ 4.8分 · 超棒</span>
+          </div>
+        </div>
+      </section>
+      <section class="section" aria-labelledby="day2-title">
+        <article class="day">
+          <div class="day-header">
+            <div class="day-no" aria-label="第二天">2</div>
+            <div>
+              <h3 id="day2-title">Day 2 · 醒来即是雪山</h3>
+              <p>海螺沟 → 燕子沟-雅家情海 → 康定 → 雅安 → 温江</p>
+            </div>
+          </div>
+          <div class="timeline">
+            <article class="stop">
+              <span class="time">07:00 - 08:30 晨间</span>
+              <h4>贡嘎雪山 · 日照金山</h4>
+              <p>
+                早起在酒店房间阳台或磨西镇远眺贡嘎雪山的日照金山。如果想进海螺沟景区看大冰川，建议早上8:30前出发去售票处排队坐观光车（进沟要排队）。如果不想进景区，可以在磨西镇周边的彩虹桥或冰川森林公园门口的河谷走走，风景也很不错。
+              </p>
+              <figure class="spot-image">
+                <img
+                  src="./温江泸定海螺沟周末自驾行程手册_assets/gongga.jpg"
+                  loading="lazy"
+                  alt="贡嘎山雪峰和自然保护区"
+                />
+                <figcaption>
+                  <h5>贡嘎雪山 · 蜀山之王</h5>
+                  <p>
+                    海拔6618米，从磨西镇可远眺爱德嘉峰等贡嘎卫峰，日出时日照金山极为壮观
+                  </p>
+                </figcaption>
+              </figure>
+            </article>
+            <article class="stop">
+              <span class="time">10:00 - 11:00 早餐 &amp; 出发</span>
+              <h4>磨西古镇 · 早餐</h4>
+              <p>
+                在磨西古镇吃早餐，品尝藏香猪、酥油茶、青稞饼等特色美食。古镇是川藏茶马古道重镇，可以逛逛老街，感受历史韵味。10点左右启程返程。
+              </p>
+              <figure class="spot-image">
+                <img
+                  src="./温江泸定海螺沟周末自驾行程手册_assets/moxi-town.jpg"
+                  loading="lazy"
+                  alt="磨西古镇的历史建筑"
+                />
+                <figcaption>
+                  <h5>磨西古镇 · 茶马古道重镇</h5>
+                  <p>
+                    沉淀着多元文化，可逛红军长征陈列馆、贡嘎山自然资源博物馆，品尝藏香猪、酥油茶
+                  </p>
+                </figcaption>
+              </figure>
+            </article>
+            <article class="stop">
+              <span class="time">14:00 - 15:00 可选停靠</span>
+              <h4>伞岗坪 · 返程再打卡</h4>
+              <p>
+                如果时间充裕，返程时可以在伞岗坪再停一次，换个角度拍兴康特大桥。或者在烹茶村逛逛，看看大渡河峡谷的午后风光。
+              </p>
+            </article>
+            <article class="stop">
+              <span class="time">17:00 - 18:00 抵达温江</span>
+              <h4>返回温江 · 结束愉快旅程</h4>
+              <p>
+                经雅安、成温邛高速返回温江，约17:00-18:00抵达，不耽误周一休息。如果还想放松一下，可以去温江鲁家滩湿地公园，开阔的水面遥望龙门山脉，看个日落吃顿鱼，完美结束旅程。
+              </p>
+              <figure class="spot-image">
+                <img
+                  src="./温江泸定海螺沟周末自驾行程手册_assets/wenjiang.jpg"
+                  loading="lazy"
+                  alt="成都市温江区温江文庙大成殿"
+                />
+                <figcaption>
+                  <h5>温江 · 鲁家滩湿地公园</h5>
+                  <p>
+                    开阔水面，天气好时能“推窗见雪山”，适合回程后发呆、看日落
+                  </p>
+                </figcaption>
+              </figure>
+            </article>
+          </div>
+        </article>
+      </section>
+      <section class="section" aria-labelledby="food-title">
+        <div class="section-title">
+          <span class="route-tag">Local flavour</span>
+          <h3 id="food-title">美食推荐</h3>
+          <p>沿途地道风味，不容错过</p>
+        </div>
+        <div class="food-grid">
+          <article class="food-card">
+            <div class="food-icon" aria-hidden="true">🍲</div>
+            <div class="food-copy">
+              <h5>李豆花饭店（泸定）</h5>
+              <p>
+                老字号川菜馆，藏在角落里的老店，距离泸定桥不远。豆花必点，蘸水很香。
+              </p>
+              <span class="dish">招牌豆花</span
+              ><span class="dish">凉拌牦牛肉</span
+              ><span class="dish">炒时蔬</span>
+            </div>
+          </article>
+          <article class="food-card">
+            <div class="food-icon" aria-hidden="true">🍖</div>
+            <div class="food-copy">
+              <h5>牦牛火锅（磨西镇）</h5>
+              <p>
+                磨西镇上很多餐馆都提供牦牛火锅，藏汉融合的经典，肉质紧实，汤底鲜美。
+              </p>
+              <span class="dish">牦牛肉炖土豆</span
+              ><span class="dish">磨西烤鸡</span
+              ><span class="dish">腊肉野菜</span>
+            </div>
+          </article>
+          <article class="food-card">
+            <div class="food-icon" aria-hidden="true">🫖</div>
+            <div class="food-copy">
+              <h5>磨西古镇特色</h5>
+              <p>
+                古镇老街上的藏式美食，酥油茶、青稞饼、藏香猪，感受茶马古道的味道。
+              </p>
+              <span class="dish">酥油茶</span><span class="dish">青稞饼</span
+              ><span class="dish">藏香猪</span>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section class="section" aria-labelledby="map-title">
+        <div class="section-title">
+          <span class="route-tag">Trip map</span>
+          <h3 id="map-title">行程路线图</h3>
+          <p>去程雅康高速 · 返程康定</p>
+        </div>
+        <div class="route-map">
+          <div class="map-route" aria-label="温江至海螺沟往返路线">
+            <div class="map-point">
+              <b>🏡</b><span>温江</span><small>出发地</small>
+            </div>
+            <i class="arrow" aria-hidden="true">→</i>
+            <div class="map-point">
+              <b>🌉</b><span>泸定桥</span><small>Day1 中午</small>
+            </div>
+            <i class="arrow" aria-hidden="true">→</i>
+            <div class="map-point">
+              <b>🌁</b><span>伞岗坪</span><small>Day1 下午</small>
+            </div>
+            <i class="arrow" aria-hidden="true">→</i>
+            <div class="map-point">
+              <b>🏨</b><span>海螺沟花水湾</span><small>Day1 入住</small>
+            </div>
+            <i class="arrow" aria-hidden="true">→</i>
+            <div class="map-point">
+              <b>🏔️</b><span>磨西古镇</span><small>Day2 早餐</small>
+            </div>
+            <i class="arrow" aria-hidden="true">→</i>
+            <div class="map-point">
+              <b>🛤️</b><span>康定</span><small>Day2 返程</small>
+            </div>
+            <i class="arrow" aria-hidden="true">→</i>
+            <div class="map-point">
+              <b>🏡</b><span>温江</span><small>返回</small>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section" aria-labelledby="tips-title">
+        <div class="section-title">
+          <span class="route-tag">Before you go</span>
+          <h3 id="tips-title">出行贴士</h3>
+          <p>出发前必看</p>
+        </div>
+        <div class="tips-grid">
+          <article class="tip-card">
+            <i>🌧️</i>
+            <h5>路况与天气</h5>
+            <p>
+              8月是川西雨季，雅安到泸定段多山路段，请关注天气预报，避免暴雨天出行引发滑坡风险。返程走G350国道，路宽但需注意避让大型货车。
+            </p>
+          </article>
+          <article class="tip-card">
+            <i>☀️</i>
+            <h5>防晒保湿</h5>
+            <p>
+              高原紫外线强，一定要涂防晒；虽然有温泉，但早晚空气干燥，记得带润唇膏和保湿霜。
+            </p>
+          </article>
+          <article class="tip-card">
+            <i>🧥</i>
+            <h5>温差提醒</h5>
+            <p>
+              磨西镇海拔约1600米，一般不会有高反，但温差大，请备好厚外套。早晚泡温泉时注意保暖。
+            </p>
+          </article>
+          <article class="tip-card">
+            <i>🎫</i>
+            <h5>门票预订</h5>
+            <p>
+              海螺沟景区门票和观光车票建议提前在美团或大麦上预订。泸定桥门票5元。返程G350国道免费通行。
+            </p>
+          </article>
+          <article class="tip-card">
+            <i>📱</i>
+            <h5>信号与补给</h5>
+            <p>
+              二郎山隧道内无信号，提前下载好离线地图。沿途加油站和便利店在泸定县城和磨西镇比较方便。
+            </p>
+          </article>
+          <article class="tip-card">
+            <i>🚗</i>
+            <h5>驾驶提醒</h5>
+            <p>
+              花水湾到海螺沟的盘山路弯道较多，请注意控制车速。返程G350国道车少路好开，但毕竟是山路，谨慎驾驶。
+            </p>
+          </article>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <p>祝您周末旅途愉快，泡个舒服的雪山温泉！<span class="heart">♥</span></p>
+      <p>
+        温江 → 泸定 → 海螺沟 · 周末自驾行程手册 · 2026年8月 ·
+        <a href="./温江泸定海螺沟周末自驾行程手册_assets/图片来源.md"
+          >图片来源与许可</a
+        >
+      </p>
+    </footer>
+  </body>
+</html>
