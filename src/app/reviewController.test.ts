@@ -126,6 +126,50 @@ describe('ReviewController', () => {
     ]);
   });
 
+  it('surfaces only the client-marked sanitized API diagnostic', async () => {
+    const logs: string[] = [];
+    const messages: string[] = [];
+    const store = new ReviewStore();
+    const controller = new ReviewController({
+      collect: async (mode) => request(mode),
+      review: async () => {
+        throw new ApiError(
+          'internal raw response with sk-secret-value',
+          429,
+          new Error('raw network cause'),
+          'Review API request failed (429): quota exhausted for the configured model.',
+        );
+      },
+      store,
+      reportError: (message) => messages.push(message),
+      log: (message) => logs.push(message),
+    });
+
+    await controller.run('file');
+
+    expect(messages).toEqual(['Review API request failed (429): quota exhausted for the configured model.']);
+    expect(store.getState()).toMatchObject({
+      status: 'error', message: 'Review API request failed (429): quota exhausted for the configured model.',
+    });
+    expect(logs.at(-1)).toBe('Review API request failed (429): quota exhausted for the configured model.');
+    expect(JSON.stringify({ messages, state: store.getState(), logs })).not.toContain('sk-secret-value');
+    expect(JSON.stringify({ messages, state: store.getState(), logs })).not.toContain('raw network cause');
+  });
+
+  it.each(['selection', 'file', 'diff'] as const)('dispatches the configured %s target from the generic review command', async (defaultMode) => {
+    const collected: ReviewMode[] = [];
+    const controller = new ReviewController({
+      collect: async (mode) => { collected.push(mode); return request(mode); },
+      review: async ({ mode }) => result(mode),
+      store: new ReviewStore(),
+    });
+
+    expect(controller.runDefault).toBeTypeOf('function');
+    await controller.runDefault(() => defaultMode);
+
+    expect(collected).toEqual([defaultMode]);
+  });
+
   it('never exposes arbitrary exception details in output, state, notifications, or the tree', async () => {
     const logs: string[] = [];
     const messages: string[] = [];

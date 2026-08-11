@@ -31,6 +31,8 @@ export interface ReviewIssue {
   file: string;
   startLine: number;
   endLine: number;
+  /** Locally collected path for navigation only. Never accepted from model output or prompts. */
+  navigationFilePath?: string;
 }
 
 export type ReviewIssueInput = Omit<ReviewIssue, 'id'>;
@@ -40,6 +42,10 @@ export interface ReviewRequest {
   content: string;
   filePath?: string;
   language?: string;
+  /** One-based complete-file line at which selected content begins. */
+  selectionStartLine?: number;
+  /** Locally collected path retained for navigation only and never included in prompts. */
+  navigationFilePath?: string;
 }
 
 export interface ReviewResult {

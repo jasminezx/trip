@@ -21,14 +21,19 @@ export class IssueNavigator implements vscode.Disposable {
     const activeFile = vscode.window.activeTextEditor?.document.uri.scheme === 'file'
       ? vscode.window.activeTextEditor.document.uri.fsPath
       : undefined;
-    const file = resolveIssueFile(issue.file, { workspaceRoots, activeFile });
+    const trustedNavigationFile = issue.navigationFilePath?.trim();
+    const navigationActiveFile = trustedNavigationFile || activeFile;
+    const file = resolveIssueFile(trustedNavigationFile || issue.file, {
+      workspaceRoots,
+      activeFile: navigationActiveFile,
+    });
     if (!file) {
       throw new Error('This issue does not include a file location.');
     }
 
     const canonicalFile = await this.canonicalizePath(file);
     const canonicalRoots = await Promise.all(workspaceRoots.map((root) => this.canonicalizePath(root)));
-    const canonicalActiveFile = activeFile ? await this.canonicalizePath(activeFile) : undefined;
+    const canonicalActiveFile = navigationActiveFile ? await this.canonicalizePath(navigationActiveFile) : undefined;
     const approvedFile = resolveIssueFile(canonicalFile, {
       workspaceRoots: canonicalRoots,
       activeFile: canonicalActiveFile,

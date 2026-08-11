@@ -7,3 +7,6 @@ All notable changes to Review Pilot are documented in this file.
 - Initial MVP release with selection, file, and Git-diff reviews.
 - Added structured Tree View findings, source navigation, and suggestion copy.
 - Added OpenAI-compatible Chat Completions configuration and release packaging.
+- Hardened HTTPS transport, bounded input and public API diagnostics, and
+  deterministic selection/diff navigation contracts.
+- Added the configurable default-target command and duplicate-finding removal.

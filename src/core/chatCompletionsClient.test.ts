@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { ApiError, ConfigurationError, ResponseError } from './errors';
 import { ChatCompletionsClient } from './chatCompletionsClient';
 
-const configuration = { apiKey: 'test-token', baseUrl: 'https://example.test', model: 'review-model', language: 'auto', maxIssues: 3, timeoutMs: 1_000 };
+const configuration = { apiKey: 'test-token', baseUrl: 'https://example.test', model: 'review-model', language: 'auto', maxIssues: 3, maxInputBytes: 100_000, timeoutMs: 1_000 };
 const prompt = { system: 'System instruction', user: 'User content' };
 
 describe('ChatCompletionsClient', () => {
@@ -33,6 +33,45 @@ describe('ChatCompletionsClient', () => {
     const cause = new Error('socket closed');
     const networkClient = new ChatCompletionsClient(configuration, async () => { throw cause; });
     await expect(networkClient.complete(prompt)).rejects.toMatchObject({ cause });
+  });
+
+  it('classifies a JSON null success payload as a response error', async () => {
+    const client = new ChatCompletionsClient(
+      configuration,
+      async () => new Response('null', { status: 200, headers: { 'Content-Type': 'application/json' } }),
+    );
+
+    await expect(client.complete(prompt)).rejects.toBeInstanceOf(ResponseError);
+    await expect(client.complete(prompt)).rejects.toThrow('response did not include message content');
+  });
+
+  it('marks only bounded redacted client diagnostics as safe for presentation', async () => {
+    const secret = configuration.apiKey;
+    const client = new ChatCompletionsClient(
+      configuration,
+      async () => new Response(JSON.stringify({
+        error: { message: `quota exhausted for model review-model using ${secret} ${'x'.repeat(2_000)}` },
+      }), { status: 429 }),
+    );
+
+    const error = await client.complete(prompt).catch((caught: unknown) => caught);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error).toMatchObject({ status: 429 });
+    const publicMessage = (error as ApiError).publicMessage ?? '';
+    expect(publicMessage).toContain('quota exhausted for model review-model');
+    expect(publicMessage).toContain('[REDACTED]');
+    expect(publicMessage).not.toContain(secret);
+    expect(publicMessage.length).toBeLessThan(600);
+  });
+
+  it('rejects a non-loopback HTTP endpoint before invoking fetch', () => {
+    let fetchCalls = 0;
+    expect(() => new ChatCompletionsClient(
+      { ...configuration, baseUrl: 'http://api.example.test' },
+      async () => { fetchCalls += 1; return new Response(); },
+    )).toThrow('HTTPS');
+    expect(fetchCalls).toBe(0);
   });
 
   it('redacts the configured API key and bounds untrusted HTTP error detail', async () => {

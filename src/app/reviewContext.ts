@@ -1,10 +1,13 @@
+import * as path from 'node:path';
 import type { ReviewRequest } from '../core/types';
 
 export interface EditorContext {
   documentText: string;
   selectionText: string;
   filePath?: string;
+  workspaceRoots?: readonly string[];
   language?: string;
+  selectionStartLine?: number;
 }
 
 export interface ProcessResult {
@@ -19,6 +22,35 @@ export class ReviewContextError extends Error {
   public readonly name = 'ReviewContextError';
 }
 
+function pathOperations(values: readonly string[]): typeof path.win32 | typeof path.posix {
+  return values.some((value) => /^[a-z]:[\\/]/i.test(value) || /^\\\\/.test(value))
+    ? path.win32
+    : path.posix;
+}
+
+function editorPathMetadata(context: EditorContext): Pick<ReviewRequest, 'filePath' | 'navigationFilePath'> {
+  const filePath = context.filePath?.trim();
+  if (!filePath) {
+    return {};
+  }
+  const roots = context.workspaceRoots ?? [];
+  const operations = pathOperations([filePath, ...roots]);
+  if (!operations.isAbsolute(filePath)) {
+    return { filePath: filePath.replace(/\\/g, '/') };
+  }
+
+  const navigationFilePath = operations.resolve(filePath);
+  for (const root of roots) {
+    const relative = operations.relative(operations.resolve(root), navigationFilePath);
+    const inside = relative === ''
+      || (relative !== '..' && !relative.startsWith(`..${operations.sep}`) && !operations.isAbsolute(relative));
+    if (inside) {
+      return { filePath: relative.replace(/\\/g, '/'), navigationFilePath };
+    }
+  }
+  return { filePath: operations.basename(navigationFilePath), navigationFilePath };
+}
+
 export function collectSelectionRequest(context: EditorContext | undefined): ReviewRequest {
   if (!context) {
     throw new ReviewContextError('Open a file and select code to review.');
@@ -29,8 +61,9 @@ export function collectSelectionRequest(context: EditorContext | undefined): Rev
   return {
     mode: 'selection',
     content: context.selectionText,
-    filePath: context.filePath,
+    ...editorPathMetadata(context),
     language: context.language,
+    selectionStartLine: Math.max(1, Math.trunc(context.selectionStartLine ?? 1)),
   };
 }
 
@@ -44,7 +77,7 @@ export function collectFileRequest(context: EditorContext | undefined): ReviewRe
   return {
     mode: 'file',
     content: context.documentText,
-    filePath: context.filePath,
+    ...editorPathMetadata(context),
     language: context.language,
   };
 }

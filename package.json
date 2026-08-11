@@ -24,6 +24,7 @@
       { "command": "reviewPilot.reviewSelectedCode", "title": "Review Pilot: Review Selected Code" },
       { "command": "reviewPilot.reviewCurrentFile", "title": "Review Pilot: Review Current File" },
       { "command": "reviewPilot.reviewGitDiff", "title": "Review Pilot: Review Git Diff" },
+      { "command": "reviewPilot.reviewDefault", "title": "Review Pilot: Review Default Target" },
       { "command": "reviewPilot.refreshResults", "title": "Review Pilot: Refresh Results", "icon": "$(refresh)" },
       { "command": "reviewPilot.openIssue", "title": "Review Pilot: Open Issue" },
       { "command": "reviewPilot.copySuggestion", "title": "Review Pilot: Copy Suggestion" },
@@ -75,7 +76,7 @@
           "type": "string",
           "default": "https://api.openai.com/v1",
           "pattern": "^https?://.+",
-          "description": "Base URL for the OpenAI-compatible API.",
+          "description": "Base URL for the OpenAI-compatible API. HTTPS is required except for localhost and loopback IP addresses.",
           "scope": "window"
         },
         "reviewPilot.model": {
@@ -96,7 +97,7 @@
           "type": "string",
           "enum": ["selection", "file", "diff"],
           "default": "selection",
-          "description": "Default scope for a review.",
+          "description": "Scope used by Review Pilot: Review Default Target.",
           "scope": "window"
         },
         "reviewPilot.maxIssues": {
@@ -105,6 +106,14 @@
           "minimum": 1,
           "maximum": 50,
           "description": "Maximum number of issues returned by a review.",
+          "scope": "window"
+        },
+        "reviewPilot.maxInputBytes": {
+          "type": "number",
+          "default": 100000,
+          "minimum": 1000,
+          "maximum": 1000000,
+          "description": "Maximum UTF-8 byte size of selection, file, or diff content sent in one review request.",
           "scope": "window"
         },
         "reviewPilot.timeoutMs": {

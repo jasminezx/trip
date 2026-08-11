@@ -37,4 +37,21 @@ describe('parseReviewResponse', () => {
   ])('rejects a %s summary', (_case, response) => {
     expect(() => parseReviewResponse(JSON.stringify(response), { maxIssues: 2 })).toThrow(ResponseError);
   });
+
+  it('deduplicates identical normalized findings before applying the issue limit', () => {
+    const duplicate = {
+      title: 'Duplicate', severity: 'HIGH', category: 'best-practice', message: ' Same issue. ',
+      suggestion: ' Fix it. ', file: './src/run.ts', startLine: '8', endLine: 8,
+    };
+    const result = parseReviewResponse(JSON.stringify({
+      summary: 'Duplicates',
+      issues: [duplicate, { ...duplicate, title: ' Duplicate ', file: 'b/src/run.ts' }, {
+        title: 'Unique', severity: 'low', category: 'maintainability', message: 'Another issue.',
+        suggestion: 'Fix that too.', file: 'src/run.ts', startLine: 9, endLine: 9,
+      }],
+    }), { maxIssues: 2, mode: 'diff' });
+
+    expect(result.issues.map((issue) => issue.title)).toEqual(['Duplicate', 'Unique']);
+    expect(new Set(result.issues.map((issue) => issue.id)).size).toBe(2);
+  });
 });

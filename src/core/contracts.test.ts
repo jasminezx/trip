@@ -20,6 +20,7 @@ type ExpectedReviewIssue = {
   file: string;
   startLine: number;
   endLine: number;
+  navigationFilePath?: string;
 };
 
 describe('normalizeReviewIssue', () => {

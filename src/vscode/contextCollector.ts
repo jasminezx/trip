@@ -9,11 +9,16 @@ function activeEditorContext(): EditorContext | undefined {
     return undefined;
   }
   const document = editor.document;
+  const workspaceRoots = vscode.workspace.workspaceFolders?.map((folder) => folder.uri.fsPath) ?? [];
   return {
     documentText: document.getText(),
     selectionText: document.getText(editor.selection),
-    filePath: document.uri.scheme === 'file' ? document.uri.fsPath : document.uri.toString(),
+    filePath: document.uri.scheme === 'file'
+      ? document.uri.fsPath
+      : document.uri.path.split('/').filter(Boolean).at(-1),
+    workspaceRoots,
     language: document.languageId,
+    selectionStartLine: editor.selection.start.line + 1,
   };
 }
 

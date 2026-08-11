@@ -1,10 +1,12 @@
 import { ResponseError } from './errors';
 import { normalizeReviewIssue } from './reviewIssue';
-import type { IssueCategory, IssueSeverity, ReviewResult } from './types';
+import type { IssueCategory, IssueSeverity, ReviewMode, ReviewResult } from './types';
 
 export interface ReviewParseOptions {
   defaultFile?: string;
   maxIssues: number;
+  mode?: ReviewMode;
+  lineOffset?: number;
 }
 
 type JsonRecord = Record<string, unknown>;
@@ -41,6 +43,32 @@ function jsonContent(raw: string): string {
   return (fenced ? fenced[1] : raw).trim();
 }
 
+function normalizeFile(value: string, mode: ReviewMode | undefined): string {
+  if (mode !== 'diff') {
+    return value;
+  }
+  let normalized = value.replace(/\\/g, '/').replace(/^"|"$/g, '');
+  if (normalized.startsWith('./')) {
+    normalized = normalized.slice(2);
+  }
+  if (normalized.startsWith('a/') || normalized.startsWith('b/')) {
+    normalized = normalized.slice(2);
+  }
+  return normalized.startsWith('./') ? normalized.slice(2) : normalized;
+}
+
+function uniqueIssues<T extends { id: string }>(issues: T[]): T[] {
+  const seen = new Set<string>();
+  return issues.filter((issue) => {
+    const key = JSON.stringify(issue);
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+}
+
 export function parseReviewResponse(raw: string, options: ReviewParseOptions): ReviewResult {
   let parsed: unknown;
   try {
@@ -56,24 +84,25 @@ export function parseReviewResponse(raw: string, options: ReviewParseOptions): R
     throw new ResponseError('Maximum issues must be a positive integer.');
   }
 
-  const defaultFile = options.defaultFile?.trim() || '(unknown file)';
-  const issues = result.issues
+  const defaultFile = normalizeFile(options.defaultFile?.trim() || '(unknown file)', options.mode);
+  const lineOffset = Number.isInteger(options.lineOffset) ? Math.max(0, options.lineOffset ?? 0) : 0;
+  const normalizedIssues = result.issues
     .map(asRecord)
     .filter((issue): issue is JsonRecord => issue !== undefined)
-    .slice(0, options.maxIssues)
     .map((issue) => {
-      const startLine = valueLine(issue.startLine, 1);
-      const endLine = Math.max(startLine, valueLine(issue.endLine, startLine));
+      const relativeStartLine = valueLine(issue.startLine, 1);
+      const relativeEndLine = Math.max(relativeStartLine, valueLine(issue.endLine, relativeStartLine));
       return normalizeReviewIssue({
         title: valueText(issue.title, 'Review finding'),
         severity: severity(issue.severity),
         category: category(issue.category),
         message: valueText(issue.message, 'The model did not provide a detailed message.'),
         suggestion: valueText(issue.suggestion, 'Review this code path and apply an appropriate fix.'),
-        file: valueText(issue.file, defaultFile),
-        startLine,
-        endLine,
+        file: normalizeFile(valueText(issue.file, defaultFile), options.mode),
+        startLine: relativeStartLine + lineOffset,
+        endLine: relativeEndLine + lineOffset,
       });
     });
+  const issues = uniqueIssues(normalizedIssues).slice(0, options.maxIssues);
   return { summary: result.summary.trim(), issues };
 }

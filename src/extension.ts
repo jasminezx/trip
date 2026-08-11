@@ -4,7 +4,14 @@ import { ReviewStore } from './app/reviewStore';
 import { validateAiConfiguration, type AiConfiguration } from './core/aiConfig';
 import { ChatCompletionsClient } from './core/chatCompletionsClient';
 import {
-  DEFAULT_BASE_URL, DEFAULT_LANGUAGE, DEFAULT_MAX_ISSUES, DEFAULT_MODEL, DEFAULT_TIMEOUT_MS, RESULTS_VIEW_ID,
+  DEFAULT_BASE_URL,
+  DEFAULT_LANGUAGE,
+  DEFAULT_MAX_INPUT_BYTES,
+  DEFAULT_MAX_ISSUES,
+  DEFAULT_MODE,
+  DEFAULT_MODEL,
+  DEFAULT_TIMEOUT_MS,
+  RESULTS_VIEW_ID,
 } from './core/constants';
 import { ReviewService } from './core/reviewService';
 import type { ReviewMode, ReviewRequest, ReviewRunResult } from './core/types';
@@ -21,8 +28,14 @@ function readConfiguration(): AiConfiguration {
     model: configuration.get<string>('model', DEFAULT_MODEL),
     language: configuration.get<string>('language', DEFAULT_LANGUAGE),
     maxIssues: configuration.get<number>('maxIssues', DEFAULT_MAX_ISSUES),
+    maxInputBytes: configuration.get<number>('maxInputBytes', DEFAULT_MAX_INPUT_BYTES),
     timeoutMs: configuration.get<number>('timeoutMs', DEFAULT_TIMEOUT_MS),
   });
+}
+
+function readDefaultMode(): ReviewMode {
+  const value = vscode.workspace.getConfiguration('reviewPilot').get<ReviewMode>('defaultMode', DEFAULT_MODE);
+  return value === 'selection' || value === 'file' || value === 'diff' ? value : DEFAULT_MODE;
 }
 
 async function executeReview(request: ReviewRequest): Promise<ReviewRunResult> {
@@ -32,7 +45,10 @@ async function executeReview(request: ReviewRequest): Promise<ReviewRunResult> {
     language: configuration.language === 'auto' ? request.language ?? 'auto' : configuration.language,
   };
   const service = new ReviewService(new ChatCompletionsClient(configuration));
-  return service.review(localizedRequest, { maxIssues: configuration.maxIssues });
+  return service.review(localizedRequest, {
+    maxIssues: configuration.maxIssues,
+    maxInputBytes: configuration.maxInputBytes,
+  });
 }
 
 function registerCommand(
@@ -70,6 +86,7 @@ export function activate(context: vscode.ExtensionContext): void {
   registerCommand(context, 'reviewPilot.reviewSelectedCode', review('selection'));
   registerCommand(context, 'reviewPilot.reviewCurrentFile', review('file'));
   registerCommand(context, 'reviewPilot.reviewGitDiff', review('diff'));
+  registerCommand(context, 'reviewPilot.reviewDefault', () => controller.runDefault(readDefaultMode));
   registerCommand(context, 'reviewPilot.refreshResults', () => controller.refresh());
   registerCommand(context, 'reviewPilot.openIssue', async (value: unknown) => {
     const issue = issueFromCommandArgument(value);

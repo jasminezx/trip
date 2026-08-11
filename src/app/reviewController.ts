@@ -1,5 +1,5 @@
 import type { ReviewMode, ReviewRequest, ReviewRunResult } from '../core/types';
-import { ApiError, ConfigurationError, ResponseError } from '../core/errors';
+import { ApiError, ConfigurationError, ResponseError, ReviewInputError } from '../core/errors';
 import { ReviewContextError } from './reviewContext';
 import type { ReviewStore } from './reviewStore';
 
@@ -16,18 +16,26 @@ export interface ReviewControllerDependencies {
 const GENERIC_REVIEW_ERROR = 'Review failed. See the Review Pilot output for details.';
 
 function safeErrorMessage(error: unknown): string {
-  return error instanceof ConfigurationError || error instanceof ResponseError || error instanceof ReviewContextError
+  if (error instanceof ApiError) {
+    return error.publicMessage ?? GENERIC_REVIEW_ERROR;
+  }
+  return error instanceof ConfigurationError || error instanceof ResponseError
+    || error instanceof ReviewContextError || error instanceof ReviewInputError
     ? error.message
     : GENERIC_REVIEW_ERROR;
 }
 
 function safeErrorDetail(error: unknown): string | undefined {
   if (error instanceof ApiError) {
+    if (error.publicMessage) {
+      return error.publicMessage;
+    }
     return error.status === undefined
       ? 'Review API request failed.'
       : `Review API request failed (HTTP ${error.status}).`;
   }
-  if (error instanceof ConfigurationError || error instanceof ResponseError || error instanceof ReviewContextError) {
+  if (error instanceof ConfigurationError || error instanceof ResponseError
+    || error instanceof ReviewContextError || error instanceof ReviewInputError) {
     return `Review failed: ${error.message}`;
   }
   return undefined;
@@ -77,5 +85,9 @@ export class ReviewController {
       return;
     }
     await this.run(target);
+  }
+
+  public async runDefault(readMode: () => ReviewMode): Promise<void> {
+    await this.run(readMode());
   }
 }

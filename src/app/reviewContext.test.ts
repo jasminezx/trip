@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { collectFileRequest, collectGitDiffRequest, collectSelectionRequest } from './reviewContext';
+import {
+  collectFileRequest,
+  collectGitDiffRequest,
+  collectSelectionRequest,
+} from './reviewContext';
 
 describe('editor review context', () => {
   it('rejects a missing editor instead of constructing an unusable selection request', () => {
@@ -19,13 +23,31 @@ describe('editor review context', () => {
     expect(collectSelectionRequest({
       documentText: 'const answer = 42;',
       selectionText: 'answer = 42',
-      filePath: 'src/answer.ts',
+      filePath: 'C:\\repo\\src\\answer.ts',
+      workspaceRoots: ['C:\\repo'],
+      selectionStartLine: 17,
       language: 'typescript',
     })).toEqual({
       mode: 'selection',
       content: 'answer = 42',
       filePath: 'src/answer.ts',
+      navigationFilePath: 'C:\\repo\\src\\answer.ts',
+      selectionStartLine: 17,
       language: 'typescript',
+    });
+  });
+
+  it('uses only a basename in the prompt when an editor file is outside the workspace', () => {
+    expect(collectSelectionRequest({
+      documentText: 'const answer = 42;',
+      selectionText: 'answer = 42',
+      filePath: 'D:\\scratch\\answer.ts',
+      workspaceRoots: ['C:\\repo'],
+      selectionStartLine: 1,
+      language: 'typescript',
+    })).toMatchObject({
+      filePath: 'answer.ts',
+      navigationFilePath: 'D:\\scratch\\answer.ts',
     });
   });
 

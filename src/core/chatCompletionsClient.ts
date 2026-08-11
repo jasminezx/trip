@@ -51,10 +51,12 @@ export class ChatCompletionsClient {
         throw error;
       }
       if (timedOut) {
-        throw new ApiError(`Review request timed out after ${this.configuration.timeoutMs}ms.`, undefined, error);
+        const message = `Review request timed out after ${this.configuration.timeoutMs}ms.`;
+        throw new ApiError(message, undefined, error, message);
       }
       const detail = error instanceof Error ? error.message : String(error);
-      throw new ApiError(`Network request failed: ${this.sanitizeErrorDetail(detail)}`, undefined, error);
+      const message = `Network request failed: ${this.sanitizeErrorDetail(detail)}`;
+      throw new ApiError(message, undefined, error, message);
     } finally {
       this.clock.clearTimeout(timeout);
     }
@@ -71,10 +73,8 @@ export class ChatCompletionsClient {
     } catch {
       // Keep the response text when the error body is not JSON.
     }
-    return new ApiError(
-      `Review API request failed (${response.status}): ${this.sanitizeErrorDetail(detail || response.statusText)}`,
-      response.status,
-    );
+    const message = `Review API request failed (${response.status}): ${this.sanitizeErrorDetail(detail || response.statusText)}`;
+    return new ApiError(message, response.status, undefined, message);
   }
 
   private sanitizeErrorDetail(detail: string): string {
@@ -94,8 +94,10 @@ export class ChatCompletionsClient {
     } catch {
       throw new ResponseError('Review API returned invalid JSON.');
     }
-    const content = (payload as { choices?: Array<{ message?: { content?: unknown } }> })
-      .choices?.[0]?.message?.content;
+    if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
+      throw new ResponseError('Review API response did not include message content.');
+    }
+    const content = (payload as { choices?: Array<{ message?: { content?: unknown } }> }).choices?.[0]?.message?.content;
     if (typeof content !== 'string' || !content.trim()) {
       throw new ResponseError('Review API response did not include message content.');
     }

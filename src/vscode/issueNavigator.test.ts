@@ -5,20 +5,40 @@ const fake = vi.hoisted(() => ({
   openedFiles: [] as string[],
   workspaceFolders: [{ uri: { fsPath: 'C:\\repo' } }],
   activeTextEditor: { document: { uri: { scheme: 'file', fsPath: 'C:\\repo\\active.ts' } } },
+  shownEditor: {
+    selection: undefined as unknown,
+    revealRange: () => undefined,
+    setDecorations: () => undefined,
+  },
 }));
 
 vi.mock('vscode', () => ({
   window: {
     get activeTextEditor() { return fake.activeTextEditor; },
     createTextEditorDecorationType: () => ({ dispose: () => undefined }),
-    showTextDocument: async () => { throw new Error('showTextDocument should not run for a rejected path'); },
+    showTextDocument: async () => fake.shownEditor,
   },
   workspace: {
     get workspaceFolders() { return fake.workspaceFolders; },
-    openTextDocument: async (file: string) => { fake.openedFiles.push(file); throw new Error('unexpected open'); },
+    openTextDocument: async (file: string) => {
+      fake.openedFiles.push(file);
+      return { lineCount: 20, lineAt: () => ({ text: 'line' }) };
+    },
   },
   Uri: { file: (file: string) => file },
   ThemeColor: class {},
+  Range: class {
+    public readonly start: unknown;
+    public readonly end: unknown;
+    public constructor(startLine: number, startCharacter: number, endLine: number, endCharacter: number) {
+      this.start = { line: startLine, character: startCharacter };
+      this.end = { line: endLine, character: endCharacter };
+    }
+  },
+  Selection: class {
+    public constructor(public readonly start: unknown, public readonly end: unknown) {}
+  },
+  TextEditorRevealType: { InCenterIfOutsideViewport: 0 },
 }));
 
 import { IssueNavigator } from './issueNavigator';
@@ -45,6 +65,20 @@ describe('IssueNavigator containment boundary', () => {
     await expect(navigator.open({ ...outsideIssue, file: 'linked.ts' }))
       .rejects.toThrow('This issue points outside the current workspace.');
     expect(fake.openedFiles).toEqual([]);
+    navigator.dispose();
+  });
+
+  it('uses locally trusted navigation metadata without putting an absolute path in the model-facing file value', async () => {
+    const navigator = new IssueNavigator(async (file) => file);
+    await navigator.open({
+      ...outsideIssue,
+      file: 'answer.ts',
+      navigationFilePath: 'D:\\scratch\\answer.ts',
+      startLine: 3,
+      endLine: 3,
+    });
+
+    expect(fake.openedFiles).toEqual(['D:\\scratch\\answer.ts']);
     navigator.dispose();
   });
 });

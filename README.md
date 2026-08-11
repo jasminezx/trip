@@ -44,8 +44,9 @@ before using an OpenAI endpoint. See OpenAI's
 | `reviewPilot.baseUrl` | `https://api.openai.com/v1` | OpenAI-compatible API base URL. |
 | `reviewPilot.model` | `gpt-4.1-mini` | Model sent with review requests. |
 | `reviewPilot.language` | `auto` | Review language, or `auto` to use the request context. |
-| `reviewPilot.defaultMode` | `selection` | Declared preferred scope; current commands always use their named scope. |
+| `reviewPilot.defaultMode` | `selection` | Scope dispatched by **Review Pilot: Review Default Target**. |
 | `reviewPilot.maxIssues` | `10` | Maximum findings returned, from 1 through 50. |
+| `reviewPilot.maxInputBytes` | `100000` | Maximum selection, file, or diff content size in UTF-8 bytes, from 1000 through 1000000. Oversized input is rejected before a request. |
 | `reviewPilot.timeoutMs` | `30000` | Request timeout in milliseconds, from 1000 through 120000. |
 
 ## Commands
@@ -55,6 +56,7 @@ before using an OpenAI endpoint. See OpenAI's
 | **Review Pilot: Review Selected Code** | The active editor selection. |
 | **Review Pilot: Review Current File** | The entire active document. |
 | **Review Pilot: Review Git Diff** | Staged and unstaged changes in the first workspace folder. |
+| **Review Pilot: Review Default Target** | The exact target selected by `reviewPilot.defaultMode`. |
 | **Review Pilot: Refresh Results** | The last successfully collected review target. |
 | **Review Pilot: Open Issue** | The selected finding's source location. |
 | **Review Pilot: Copy Suggestion** | The selected finding's suggestion, when available. |
@@ -83,14 +85,24 @@ provided VS Code launch configuration to start an Extension Development Host.
 
 ## Privacy and security
 
-Review content is sent to the configured API endpoint to obtain findings. Do
-not review code that you are not authorized to send to that endpoint. Review
+Review content is sent to the configured API endpoint to obtain findings. This
+includes the selected code, current-file content, or Git diff, plus the file's
+language identifier and prompt-facing path metadata. For files inside an open
+workspace, the prompt path is workspace-relative; for editor files outside a
+workspace, only the basename is sent. Trusted absolute local paths are retained
+only in extension state for source navigation and are not put in model prompts.
+Do not review code that you are not authorized to send to that endpoint. Review
 the endpoint's privacy, retention, and billing policies before use.
 
 The extension does not write API keys to its output channel, error messages,
-repository files, or prompts. It avoids surfacing arbitrary API/network error
-text in the UI. Network requests include the configured API key in the
-Authorization header only.
+repository files, or prompts. API/network diagnostics shown in the UI or output
+are bounded, whitespace-normalized, and stripped of the configured key; raw
+causes and unbounded response bodies are not surfaced. Network requests include
+the configured API key in the Authorization header only.
+
+HTTPS is required for configured API endpoints. Cleartext HTTP is accepted only
+for explicit loopback hosts (`localhost`, IPv4 `127.0.0.0/8`, and IPv6 `::1`)
+to support local model servers.
 
 ## Troubleshooting
 
@@ -99,6 +111,9 @@ Authorization header only.
 - **Timeout or network failure.** Confirm `reviewPilot.baseUrl`, network
   access, API billing, model availability, and increase `reviewPilot.timeoutMs`
   only when appropriate.
+- **Input is too large.** Reduce the selection/diff or increase
+  `reviewPilot.maxInputBytes`; the limit is measured in UTF-8 bytes and defaults
+  to 100000.
 - **No findings for a Git diff.** The command reviews only staged/unstaged
   changes in the first workspace folder; make a change or select the intended
   workspace folder.

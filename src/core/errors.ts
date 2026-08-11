@@ -1,4 +1,4 @@
-export type ReviewPilotErrorCode = 'configuration' | 'api' | 'response';
+export type ReviewPilotErrorCode = 'configuration' | 'api' | 'response' | 'input';
 
 export class ReviewPilotError extends Error {
   public readonly name: string = 'ReviewPilotError';
@@ -22,7 +22,13 @@ export class ConfigurationError extends ReviewPilotError {
 export class ApiError extends ReviewPilotError {
   public readonly name = 'ApiError';
 
-  public constructor(message: string, public readonly status?: number, public readonly cause?: unknown) {
+  public constructor(
+    message: string,
+    public readonly status?: number,
+    public readonly cause?: unknown,
+    /** Bounded and redacted by the API client; safe to show in extension UI and output. */
+    public readonly publicMessage?: string,
+  ) {
     super(message, 'api');
   }
 }
@@ -32,5 +38,13 @@ export class ResponseError extends ReviewPilotError {
 
   public constructor(message: string) {
     super(message, 'response');
+  }
+}
+
+export class ReviewInputError extends ReviewPilotError {
+  public readonly name = 'ReviewInputError';
+
+  public constructor(message: string) {
+    super(message, 'input');
   }
 }

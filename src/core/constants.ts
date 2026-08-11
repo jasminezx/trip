@@ -8,7 +8,9 @@ export const DEFAULT_MODEL = 'gpt-4.1-mini';
 export const DEFAULT_LANGUAGE = 'auto';
 export const DEFAULT_MODE: ReviewMode = 'selection';
 export const DEFAULT_MAX_ISSUES = 10;
+export const DEFAULT_MAX_INPUT_BYTES = 100_000;
 export const DEFAULT_TIMEOUT_MS = 30_000;
 
 export const MAX_ISSUES_RANGE = { minimum: 1, maximum: 50 } as const;
+export const MAX_INPUT_BYTES_RANGE = { minimum: 1_000, maximum: 1_000_000 } as const;
 export const TIMEOUT_MS_RANGE = { minimum: 1_000, maximum: 120_000 } as const;
