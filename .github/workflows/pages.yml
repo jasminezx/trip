@@ -26,6 +26,7 @@ jobs:
         run: |
           mkdir -p ./out
           cp -r ./docs/site/. ./out/
+          node ./scripts/generate-index.js
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
