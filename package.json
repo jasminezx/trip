@@ -46,6 +46,13 @@
           "when": "view == reviewPilot.results",
           "group": "navigation"
         }
+      ],
+      "view/item/context": [
+        {
+          "command": "reviewPilot.copySuggestion",
+          "when": "view == reviewPilot.results && viewItem == reviewPilot.issue",
+          "group": "inline"
+        }
       ]
     },
     "configuration": {
