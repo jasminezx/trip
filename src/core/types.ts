@@ -67,6 +67,8 @@ export interface IssueIdInput {
   filePath: string;
   range: ReviewRange;
   message: string;
+  title: string;
+  suggestion: string;
 }
 
 export interface DocumentBoundary {

@@ -73,6 +73,35 @@ describe('ReviewService', () => {
     expect(issueLineRange(result.issues[0])).toEqual({ startLine: 7, endLine: 8 });
   });
 
+  it('only strips a/ and b/ prefixes for files present in the collected diff', async () => {
+    const service = new ReviewService({ complete: async () => (
+      '{"summary":"Mixed paths","issues":[' +
+      '{"title":"Keep","severity":"low","category":"best_practice","message":"Keep prefix.","suggestion":"Keep it.","file":"a/service.ts", "startLine":1, "endLine":1},' +
+      '{"title":"Strip","severity":"low","category":"best_practice","message":"Strip prefix.","suggestion":"Strip it.","file":"b/src/answer.ts", "startLine":2, "endLine":2}]}'
+    ) });
+    const result = await service.review({
+      mode: 'diff',
+      content: [
+        'diff --git a/a/service.ts b/a/service.ts',
+        'index 111..222 100644',
+        '--- a/a/service.ts',
+        '+++ b/a/service.ts',
+        '@@ -1,1 +1,1 @@',
+        ' old',
+        '+new',
+        'diff --git a/src/answer.ts b/src/answer.ts',
+        'index 111..222 100644',
+        '--- a/src/answer.ts',
+        '+++ b/src/answer.ts',
+        '@@ -1,1 +1,1 @@',
+        ' old',
+        '+new',
+      ].join('\n'),
+    }, { maxIssues: 4, maxInputBytes: 100_000 });
+
+    expect(result.issues.map((issue) => issue.file)).toEqual(['a/service.ts', 'src/answer.ts']);
+  });
+
   it('enforces a UTF-8 byte limit before invoking the completion client', async () => {
     let completions = 0;
     const service = new ReviewService({ complete: async () => {

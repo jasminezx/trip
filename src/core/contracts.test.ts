@@ -38,7 +38,7 @@ describe('normalizeReviewIssue', () => {
 
     expectTypeOf(issue).toEqualTypeOf<ExpectedReviewIssue>();
     expect(issue).toEqual({
-      id: 'issue_7bcb1124',
+      id: expect.stringMatching(/^issue_[0-9a-f]{8}$/),
       title: 'Unsafe shell command',
       severity: 'high',
       category: 'security',
@@ -52,12 +52,23 @@ describe('normalizeReviewIssue', () => {
 });
 
 describe('createIssueId', () => {
-  it('creates a stable identifier from the issue location and message', () => {
+  it('creates a stable identifier from issue identity fields', () => {
+    const id = createIssueId({
+      filePath: 'src/example.ts',
+      range: { startLine: 2, startCharacter: 4, endLine: 2, endCharacter: 9 },
+      message: 'Avoid mutable shared state',
+      title: 'No mutation',
+      suggestion: 'Use const',
+    });
+
+    expect(id).toMatch(/^issue_[0-9a-f]{8}$/);
     expect(createIssueId({
       filePath: 'src/example.ts',
       range: { startLine: 2, startCharacter: 4, endLine: 2, endCharacter: 9 },
       message: 'Avoid mutable shared state',
-    })).toBe('issue_6e7c7e3e');
+      title: 'No mutation',
+      suggestion: 'Use const',
+    })).toBe(id);
   });
 
   it('distinguishes issues with a different range', () => {
@@ -65,14 +76,44 @@ describe('createIssueId', () => {
       filePath: 'src/example.ts',
       range: { startLine: 0, startCharacter: 0, endLine: 0, endCharacter: 2 },
       message: 'Use const',
+      title: 'Mutability',
+      suggestion: 'Extract helper',
     });
     const second = createIssueId({
       filePath: 'src/example.ts',
       range: { startLine: 1, startCharacter: 0, endLine: 1, endCharacter: 2 },
       message: 'Use const',
+      title: 'Mutability',
+      suggestion: 'Extract helper',
     });
 
     expect(first).not.toBe(second);
+  });
+
+  it('distinguishes findings with same location and message but different title or suggestion', () => {
+    const first = createIssueId({
+      filePath: 'src/example.ts',
+      range: { startLine: 2, startCharacter: 0, endLine: 2, endCharacter: 3 },
+      message: 'Shared message',
+      title: 'One',
+      suggestion: 'Fix it',
+    });
+    const second = createIssueId({
+      filePath: 'src/example.ts',
+      range: { startLine: 2, startCharacter: 0, endLine: 2, endCharacter: 3 },
+      message: 'Shared message',
+      title: 'One',
+      suggestion: 'Different suggestion',
+    });
+    const third = createIssueId({
+      filePath: 'src/example.ts',
+      range: { startLine: 2, startCharacter: 0, endLine: 2, endCharacter: 3 },
+      message: 'Shared message',
+      title: 'Different title',
+      suggestion: 'Fix it',
+    });
+
+    expect(new Set([first, second, third]).size).toBe(3);
   });
 });
 

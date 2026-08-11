@@ -7,6 +7,7 @@ export interface ReviewParseOptions {
   maxIssues: number;
   mode?: ReviewMode;
   lineOffset?: number;
+  diffFilePaths?: ReadonlyArray<string> | ReadonlySet<string>;
 }
 
 type JsonRecord = Record<string, unknown>;
@@ -38,23 +39,58 @@ function category(value: unknown): IssueCategory {
     : 'maintainability';
 }
 
+function normalizeFile(value: string): string {
+  let normalized = value.replace(/\\/g, '/').replace(/^"|"$/g, '').trim();
+  if (normalized.startsWith('./')) {
+    normalized = normalized.slice(2);
+  }
+  return normalized;
+}
+
 function jsonContent(raw: string): string {
   const fenced = raw.trim().match(/^```(?:json)?\s*\n?([\s\S]*?)\s*```$/i);
   return (fenced ? fenced[1] : raw).trim();
 }
 
-function normalizeFile(value: string, mode: ReviewMode | undefined): string {
+function asDiffPathSet(paths?: ReviewParseOptions['diffFilePaths']): Set<string> | undefined {
+  if (!paths || (Array.isArray(paths) && paths.length === 0)) {
+    return undefined;
+  }
+  const normalizedPaths = new Set<string>();
+  const values = paths instanceof Set ? [...paths] : paths;
+  for (const value of values) {
+    const normalized = value.trim().replace(/\\/g, '/');
+    if (normalized) {
+      normalizedPaths.add(normalized);
+    }
+  }
+  return normalizedPaths.size ? normalizedPaths : undefined;
+}
+
+function stripDiffPrefix(value: string): string {
+  return value.slice(2);
+}
+
+function normalizeFileForMode(
+  value: string,
+  mode: ReviewMode | undefined,
+  diffFilePaths: Set<string> | undefined,
+): string {
+  const normalized = normalizeFile(value);
   if (mode !== 'diff') {
-    return value;
+    return normalized;
   }
-  let normalized = value.replace(/\\/g, '/').replace(/^"|"$/g, '');
-  if (normalized.startsWith('./')) {
-    normalized = normalized.slice(2);
+
+  if (!normalized.startsWith('a/') && !normalized.startsWith('b/')) {
+    return normalized;
   }
-  if (normalized.startsWith('a/') || normalized.startsWith('b/')) {
-    normalized = normalized.slice(2);
+
+  if (!diffFilePaths || diffFilePaths.size === 0) {
+    return normalized;
   }
-  return normalized.startsWith('./') ? normalized.slice(2) : normalized;
+
+  const withoutPrefix = stripDiffPrefix(normalized);
+  return diffFilePaths.has(withoutPrefix) ? withoutPrefix : normalized;
 }
 
 function uniqueIssues<T extends { id: string }>(issues: T[]): T[] {
@@ -70,6 +106,7 @@ function uniqueIssues<T extends { id: string }>(issues: T[]): T[] {
 }
 
 export function parseReviewResponse(raw: string, options: ReviewParseOptions): ReviewResult {
+  const diffFilePaths = asDiffPathSet(options.diffFilePaths);
   let parsed: unknown;
   try {
     parsed = JSON.parse(jsonContent(raw));
@@ -84,7 +121,7 @@ export function parseReviewResponse(raw: string, options: ReviewParseOptions): R
     throw new ResponseError('Maximum issues must be a positive integer.');
   }
 
-  const defaultFile = normalizeFile(options.defaultFile?.trim() || '(unknown file)', options.mode);
+  const defaultFile = normalizeFile(options.defaultFile?.trim() || '(unknown file)');
   const lineOffset = Number.isInteger(options.lineOffset) ? Math.max(0, options.lineOffset ?? 0) : 0;
   const normalizedIssues = result.issues
     .map(asRecord)
@@ -98,7 +135,7 @@ export function parseReviewResponse(raw: string, options: ReviewParseOptions): R
         category: category(issue.category),
         message: valueText(issue.message, 'The model did not provide a detailed message.'),
         suggestion: valueText(issue.suggestion, 'Review this code path and apply an appropriate fix.'),
-        file: normalizeFile(valueText(issue.file, defaultFile), options.mode),
+        file: normalizeFileForMode(valueText(issue.file, defaultFile), options.mode, diffFilePaths),
         startLine: relativeStartLine + lineOffset,
         endLine: relativeEndLine + lineOffset,
       });

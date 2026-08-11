@@ -49,9 +49,26 @@ describe('parseReviewResponse', () => {
         title: 'Unique', severity: 'low', category: 'maintainability', message: 'Another issue.',
         suggestion: 'Fix that too.', file: 'src/run.ts', startLine: 9, endLine: 9,
       }],
-    }), { maxIssues: 2, mode: 'diff' });
+    }), { maxIssues: 2, mode: 'diff', diffFilePaths: ['src/run.ts'] });
 
     expect(result.issues.map((issue) => issue.title)).toEqual(['Duplicate', 'Unique']);
     expect(new Set(result.issues.map((issue) => issue.id)).size).toBe(2);
+  });
+
+  it('normalizes a/ and b/ prefixes only for known diff targets', () => {
+    const response = {
+      summary: 'Paths',
+      issues: [
+        { title: 'Prefix preserved', severity: 'medium', category: 'security', message: 'One', suggestion: 'Fix one.', file: 'a/service.ts' },
+        { title: 'Prefix stripped', severity: 'low', category: 'bug', message: 'Two', suggestion: 'Fix two.', file: 'b/src/answer.ts' },
+      ],
+    };
+    const result = parseReviewResponse(JSON.stringify(response), {
+      maxIssues: 2,
+      mode: 'diff',
+      diffFilePaths: ['a/service.ts', 'src/answer.ts'],
+    });
+
+    expect(result.issues.map((issue) => issue.file)).toEqual(['a/service.ts', 'src/answer.ts']);
   });
 });

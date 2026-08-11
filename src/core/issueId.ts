@@ -12,7 +12,7 @@ function hash32(value: string): string {
 }
 
 export function createIssueId(input: IssueIdInput): string {
-  const { filePath, message, range } = input;
+  const { filePath, message, range, title, suggestion } = input;
   const location = `${range.startLine}:${range.startCharacter}-${range.endLine}:${range.endCharacter}`;
-  return `issue_${hash32(`${filePath}|${location}|${message}`)}`;
+  return `issue_${hash32(`${filePath}|${location}|${message}|${title}|${suggestion}`)}`;
 }
