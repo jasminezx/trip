@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 
 import { createIssueId } from './issueId';
+import { normalizeReviewIssue } from './reviewIssue';
 import {
   clampRange,
   isValidRange,
@@ -8,6 +9,46 @@ import {
   textInRange,
   truncateText,
 } from './text';
+
+type ExpectedReviewIssue = {
+  id: string;
+  title: string;
+  severity: 'high' | 'medium' | 'low';
+  category: 'bug' | 'performance' | 'security' | 'maintainability' | 'best_practice';
+  message: string;
+  suggestion: string;
+  file: string;
+  startLine: number;
+  endLine: number;
+};
+
+describe('normalizeReviewIssue', () => {
+  it('returns the exact normalized issue contract used by the review pipeline', () => {
+    const issue = normalizeReviewIssue({
+      title: ' Unsafe shell command ',
+      severity: 'high',
+      category: 'security',
+      message: ' User input reaches exec. ',
+      suggestion: ' Validate the command. ',
+      file: ' src/run.ts ',
+      startLine: 8,
+      endLine: 6,
+    });
+
+    expectTypeOf(issue).toEqualTypeOf<ExpectedReviewIssue>();
+    expect(issue).toEqual({
+      id: 'issue_7bcb1124',
+      title: 'Unsafe shell command',
+      severity: 'high',
+      category: 'security',
+      message: 'User input reaches exec.',
+      suggestion: 'Validate the command.',
+      file: 'src/run.ts',
+      startLine: 8,
+      endLine: 8,
+    });
+  });
+});
 
 describe('createIssueId', () => {
   it('creates a stable identifier from the issue location and message', () => {

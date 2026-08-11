@@ -1,6 +1,13 @@
 export type ReviewMode = 'selection' | 'file' | 'diff';
 
-export type IssueSeverity = 'info' | 'warning' | 'error';
+export type IssueSeverity = 'high' | 'medium' | 'low';
+
+export type IssueCategory =
+  | 'bug'
+  | 'performance'
+  | 'security'
+  | 'maintainability'
+  | 'best_practice';
 
 export interface TextPosition {
   line: number;
@@ -16,13 +23,17 @@ export interface ReviewRange {
 
 export interface ReviewIssue {
   id: string;
-  filePath: string;
-  range: ReviewRange;
+  title: string;
   severity: IssueSeverity;
+  category: IssueCategory;
   message: string;
-  explanation?: string;
-  suggestion?: string;
+  suggestion: string;
+  file: string;
+  startLine: number;
+  endLine: number;
 }
+
+export type ReviewIssueInput = Omit<ReviewIssue, 'id'>;
 
 export interface ReviewRequest {
   mode: ReviewMode;

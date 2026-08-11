@@ -55,7 +55,7 @@
           "type": "string",
           "default": "",
           "description": "API key used to authenticate review requests.",
-          "scope": "window"
+          "scope": "machine"
         },
         "reviewPilot.baseUrl": {
           "type": "string",
