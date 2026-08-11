@@ -22,7 +22,7 @@ export class ConfigurationError extends ReviewPilotError {
 export class ApiError extends ReviewPilotError {
   public readonly name = 'ApiError';
 
-  public constructor(message: string, public readonly status?: number) {
+  public constructor(message: string, public readonly status?: number, public readonly cause?: unknown) {
     super(message, 'api');
   }
 }

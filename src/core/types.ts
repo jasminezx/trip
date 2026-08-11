@@ -47,6 +47,16 @@ export interface ReviewResult {
   summary?: string;
 }
 
+export interface ReviewMetadata {
+  mode: ReviewMode;
+  reviewedAt: string;
+  issueCount: number;
+}
+
+export interface ReviewRunResult extends ReviewResult {
+  metadata: ReviewMetadata;
+}
+
 export interface IssueIdInput {
   filePath: string;
   range: ReviewRange;
