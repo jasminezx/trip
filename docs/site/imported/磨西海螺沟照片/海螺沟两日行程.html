@@ -1,0 +1,423 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>磨西海螺沟两日行程｜一段温柔的山里时光</title>
+    <style>
+      :root {
+        --bg: #f0f4ff;
+        --text: #243248;
+        --muted: #64718a;
+        --line: #cedeff;
+        --accent: #3b63bf;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+        background: radial-gradient(circle at 16% 0%, #dfebff 0%, transparent 38%), var(--bg);
+        color: var(--text);
+        line-height: 1.9;
+      }
+      .wrap {
+        max-width: 1020px;
+        margin: 0 auto;
+        padding: 20px 16px 40px;
+      }
+      .hero {
+        background: linear-gradient(120deg, #4567c7, #2d90d8);
+        color: #fff;
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 14px 30px rgba(39, 76, 153, 0.25);
+      }
+      h1 {
+        margin: 0;
+        font-size: 2rem;
+      }
+      .hero p {
+        margin: 10px 0 0;
+        color: #dde9ff;
+      }
+      .card {
+        background: #fff;
+        margin-top: 14px;
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: 0 10px 24px rgba(43, 70, 125, 0.08);
+      }
+      .section-title {
+        margin: 0 0 8px;
+        color: var(--accent);
+        font-size: 1.45rem;
+      }
+      .section-sub {
+        margin: 0 0 10px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+      .story-card {
+        border-left: 4px solid #d5e1ff;
+        padding-left: 14px;
+        margin-top: 12px;
+      }
+      .story-row {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 14px;
+        align-items: center;
+      }
+      .story-row.reverse {
+        grid-template-columns: 1.2fr 1fr;
+      }
+      @media (max-width: 900px) {
+        .story-row,
+        .story-row.reverse {
+          grid-template-columns: 1fr;
+        }
+      }
+      .story-text {
+        margin: 0;
+      }
+      .story-text p {
+        margin: 0 0 10px;
+      }
+      .story-image {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+        display: block;
+      }
+      .light-btn {
+        width: 100%;
+        border: 0;
+        padding: 0;
+        border-radius: 14px;
+        background: transparent;
+        cursor: zoom-in;
+      }
+      .img-tip {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+      .spot-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .spot {
+        padding: 12px;
+        border: 1px solid #d8e2f7;
+        border-radius: 12px;
+        background: #f9fbff;
+      }
+      .spot h3 {
+        margin: 0 0 8px;
+        color: var(--accent);
+      }
+      .spot p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .gallery-title {
+        margin: 0 0 10px;
+        font-size: 1.1rem;
+        color: #29456d;
+      }
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .gallery button {
+        width: 100%;
+        display: block;
+      }
+      .gallery img {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 1px solid #d6e2f7;
+        cursor: zoom-in;
+        display: block;
+      }
+      @media (max-width: 768px) {
+        .gallery {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      .lightbox {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(10, 22, 40, 0.82);
+        z-index: 99;
+        padding: 20px;
+      }
+      .lightbox.open { display: flex; }
+      .lightbox-inner {
+        max-width: min(1200px, 95vw);
+        max-height: 95vh;
+      }
+      .lightbox-inner img {
+        width: 100%;
+        max-height: 90vh;
+        object-fit: contain;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      }
+      .close {
+        position: fixed;
+        top: 16px;
+        right: 20px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: none;
+        background: #fff;
+        color: #334;
+        font-size: 22px;
+        cursor: pointer;
+      }
+      .foot {
+        margin-top: 12px;
+        color: var(--muted);
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="hero">
+        <h1>一趟慢慢发光的两天：磨西海螺沟</h1>
+        <p>照片不是为了证明我们“去了哪里”，而是为了把那两天里被风和阳光轻轻擦过的瞬间，慢慢留住。</p>
+        <p>温度有些降下来，心情反而被放大了——日出、温泉、雪色与孩子的笑，都很温柔。</p>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">先暖一段心，再看一段山</h2>
+        <p class="section-sub">前一天只做“到达和适应”，第二天再把重头戏留给雪山与清晨。</p>
+        <div class="story-card">
+          <p class="story-text">
+            这趟行程最舒服的地方，不在于赶最远的路，而是让大家都有自己的节奏。早出发、慢一点看路、吃好饭、留一点力，这样第二天遇到景色，才能真的“看见”。带着孩子在山里走，情绪也比风景同样重要。
+          </p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">第一天：从泸定桥的晃动，到院子里的舒缓</h2>
+        <p class="section-sub">7:30 出发 · 11:00 泸定 · 傍晚古镇与夜色 · 泡温泉入夜</p>
+
+        <div class="story-card">
+          <div class="story-row">
+            <div class="story-text">
+              <p>清晨从温江出发，车窗外的风刚刚好。到泸定时天色是晴的，温度却收起来了，像一层轻轻的凉意把行程按进了“真实”的模式。我们也不急着冲刺，先稳一稳，找好停靠点，再继续，心情比速度更重要。</p>
+            </div>
+            <button type="button" class="light-btn" data-src="./泸定.jpg" aria-label="放大查看出发与路途">
+              <img src="./泸定.jpg" alt="出发路途" class="story-image" />
+            </button>
+          </div>
+          <p class="img-tip">图 1：清晨起步，带着期待上路</p>
+        </div>
+
+        <div class="story-card">
+          <div class="story-row reverse">
+            <button type="button" class="light-btn" data-src="./泸定2.jpg" aria-label="放大查看泸定桥">
+              <img src="./泸定2.jpg" alt="泸定桥场景" class="story-image" />
+            </button>
+            <div class="story-text">
+              <p>泸定桥那一段其实很短，却很有画面。铁链在风里轻轻晃，孩子跑得很勇敢，旁边有些发紧，也有些激动。过桥后不用折返，顺路往左走到纪念公园，像走过一个小弯，心也慢慢稳下来了。</p>
+            </div>
+          </div>
+          <p class="img-tip">图 2：桥上风的抖动和我们的一次勇敢</p>
+        </div>
+
+        <div class="story-card">
+          <div class="story-row">
+            <div class="story-text">
+              <p>下午去伞岗坪，站在观景台上看大渡河时，喧闹像被远远放了个慢镜头。路过的景都没有催我们，反而给了呼吸的时间。天、山、桥和水都在远处慢慢说话，这一刻特别适合停下来。</p>
+            </div>
+            <button type="button" class="light-btn" data-src="./伞岗坪.jpg" aria-label="放大查看伞岗坪风景">
+              <img src="./伞岗坪.jpg" alt="伞岗坪观景" class="story-image" />
+            </button>
+          </div>
+          <p class="img-tip">图 3：伞岗坪的风，和大渡河的声音</p>
+        </div>
+
+        <div class="story-card">
+          <div class="story-row reverse">
+            <button type="button" class="light-btn" data-src="./磨西古镇.jpg" aria-label="放大查看温泉酒店">
+              <img src="./磨西古镇.jpg" alt="酒店温泉时光" class="story-image" />
+            </button>
+            <div class="story-text">
+              <p>晚上回到酒店，孩子们先和水打招呼，后面我们也放下紧绷。那一池温泉有着自然的硫磺味，反而像提醒：你终于到了该让身体放松的地方。晚餐也很朴实，牛肉汤锅和烤肉都很入味，在小院摇椅上听音乐，心情一下软了下来。</p>
+            </div>
+          </div>
+          <p class="img-tip">图 4：归宿感，就是晚一点才出现的温度</p>
+        </div>
+
+        <div class="story-card">
+          <p class="story-text" style="margin-bottom: 10px;">这一段的更多瞬间（第一天）</p>
+          <div class="gallery">
+            <button type="button" class="light-btn" data-src="./泸定1.jpg"><img src="./泸定1.jpg" alt="泸定1" /></button>
+            <button type="button" class="light-btn" data-src="./泸定3.jpg"><img src="./泸定3.jpg" alt="泸定3" /></button>
+            <button type="button" class="light-btn" data-src="./泸定4.jpg"><img src="./泸定4.jpg" alt="泸定4" /></button>
+            <button type="button" class="light-btn" data-src="./泸定5.jpg"><img src="./泸定5.jpg" alt="泸定5" /></button>
+            <button type="button" class="light-btn" data-src="./泸定6.jpg"><img src="./泸定6.jpg" alt="泸定6" /></button>
+            <button type="button" class="light-btn" data-src="./泸定7.jpg"><img src="./泸定7.jpg" alt="泸定7" /></button>
+            <button type="button" class="light-btn" data-src="./伞岗坪1.jpg"><img src="./伞岗坪1.jpg" alt="伞岗坪1" /></button>
+            <button type="button" class="light-btn" data-src="./伞岗坪2.jpg"><img src="./伞岗坪2.jpg" alt="伞岗坪2" /></button>
+            <button type="button" class="light-btn" data-src="./磨西古镇1.jpg"><img src="./磨西古镇1.jpg" alt="磨西古镇1" /></button>
+            <button type="button" class="light-btn" data-src="./磨西古镇3.jpg"><img src="./磨西古镇3.jpg" alt="磨西古镇3" /></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">第二天：把日出当成开场，把慢行当成答案</h2>
+        <p class="section-sub">6:30 前起身 · 6:38 左右看第一道金色 · 先看雪山再下山</p>
+
+        <div class="story-card">
+          <div class="story-row">
+            <div class="story-text">
+              <p>第二天醒得比闹钟还早。把自己让到日出前的位置，很像在给心里留一个空位。然后看着光慢慢落在雪峰上，颜色一层层往前推，像有人在云上轻轻抹了金。</p>
+            </div>
+            <button type="button" class="light-btn" data-src="./海螺沟.jpg" aria-label="放大查看日出">
+              <img src="./海螺沟.jpg" alt="日出景象" class="story-image" />
+            </button>
+          </div>
+          <p class="img-tip">图 5：日出前后的那一点温柔</p>
+        </div>
+
+        <div class="story-card">
+          <div class="story-row reverse">
+            <button type="button" class="light-btn" data-src="./海螺沟1.jpg" aria-label="放大查看第一营地">
+              <img src="./海螺沟1.jpg" alt="第一营地雪景" class="story-image" />
+            </button>
+            <div class="story-text">
+              <p>到了第一营地后，天空和雪景像换了情绪：没那么炽热，却更纯净。树与岩石被晒出一点点暖黄，和上午的金色形成反差，像是同一条山线写了两种心情。</p>
+            </div>
+          </div>
+          <p class="img-tip">图 6：第一营地，白与金两种静默的颜色</p>
+        </div>
+
+        <div class="story-card">
+          <div class="story-row">
+            <div class="story-text">
+              <p>早集后去燕子沟采蘑菇，本来是给行程加一点“乡村呼吸”。高海拔的路并不怕慢，慢一点才有风景；路边牛羊和树影偶尔靠近，很有生活味。爬到有点累时，我们选择停，回头看着溪水，让呼吸重新对齐。</p>
+            </div>
+            <button type="button" class="light-btn" data-src="./燕子沟.jpg" aria-label="放大查看采蘑菇路线">
+              <img src="./燕子沟.jpg" alt="采蘑菇路线" class="story-image" />
+            </button>
+          </div>
+          <p class="img-tip">图 7：燕子沟边的风、草地和一点点小勇气</p>
+        </div>
+
+        <div class="story-card">
+          <div class="story-row reverse">
+            <button type="button" class="light-btn" data-src="./磨西古镇2.jpg" aria-label="放大查看回程">
+              <img src="./磨西古镇2.jpg" alt="回程时景色" class="story-image" />
+            </button>
+            <div class="story-text">
+              <p>离开后回到康定，吃了顿饭、轻轻逛了下，直到傍晚赶回温江。和很多旅行一样，最有记忆的不是终点，而是中途那些把人放慢的片段——回头想的时候，都是暖色的。</p>
+            </div>
+          </div>
+          <p class="img-tip">图 8：回程路，不赶也不慢，刚刚好</p>
+        </div>
+
+        <div class="story-card">
+          <p class="story-text" style="margin-bottom: 10px;">这一段的更多瞬间（第二天）</p>
+          <div class="gallery">
+            <button type="button" class="light-btn" data-src="./海螺沟2.jpg"><img src="./海螺沟2.jpg" alt="海螺沟2" /></button>
+            <button type="button" class="light-btn" data-src="./燕子沟1.jpg"><img src="./燕子沟1.jpg" alt="燕子沟1" /></button>
+            <button type="button" class="light-btn" data-src="./燕子沟2.jpg"><img src="./燕子沟2.jpg" alt="燕子沟2" /></button>
+            <button type="button" class="light-btn" data-src="./燕子沟3.jpg"><img src="./燕子沟3.jpg" alt="燕子沟3" /></button>
+            <button type="button" class="light-btn" data-src="./燕子沟4.jpg"><img src="./燕子沟4.jpg" alt="燕子沟4" /></button>
+            <button type="button" class="light-btn" data-src="./燕子沟5.jpg"><img src="./燕子沟5.jpg" alt="燕子沟5" /></button>
+            <button type="button" class="light-btn" data-src="./燕子沟6.jpg"><img src="./燕子沟6.jpg" alt="燕子沟6" /></button>
+            <button type="button" class="light-btn" data-src="./燕子沟7.jpg"><img src="./燕子沟7.jpg" alt="燕子沟7" /></button>
+            <button type="button" class="light-btn" data-src="./燕子沟8.jpg"><img src="./燕子沟8.jpg" alt="燕子沟8" /></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">景区小介绍（给下一次行程做个诗意清单）</h2>
+        <div class="story-card">
+          <div class="spot-grid">
+            <article class="spot">
+              <h3>泸定桥</h3>
+              <p>有厚重历史，也有很“在场”的当代感觉。早上人少一点，带孩子更容易照顾，过桥时给点耐心和安稳就很好。</p>
+            </article>
+            <article class="spot">
+              <h3>伞岗坪</h3>
+              <p>适合慢观的大窗，适合放下手机看一会儿天。大渡河和远处大桥在这里能一起看见，景深很舒服。</p>
+            </article>
+            <article class="spot">
+              <h3>第一营地 / 垭口</h3>
+              <p>看日出和看白天的雪，像看两张不同的照片。建议分时段停留，让“光的温度”真正进到你心里。</p>
+            </article>
+            <article class="spot">
+              <h3>燕子沟 - 雅家情海</h3>
+              <p>适合家庭轻行、拍自然，也适合“想静下来”地走。高海拔下，别和自己较劲，慢一点才对。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <p class="foot">这一版把文字写得更轻一点：不争辩、不总结太多，只记录风、光、孩子和我们这两天慢慢发酵的心情。</p>
+    </main>
+
+    <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="图片预览">
+      <button class="close" id="close-lightbox" aria-label="关闭预览">×</button>
+      <div class="lightbox-inner">
+        <img id="lightbox-img" src="" alt="放大查看" />
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const lightbox = document.getElementById('lightbox');
+        const viewer = document.getElementById('lightbox-img');
+        const closeBtn = document.getElementById('close-lightbox');
+        const openBtn = (ev) => {
+          const btn = ev.currentTarget;
+          const src = btn.getAttribute('data-src');
+          if (!src) return;
+          viewer.src = src;
+          lightbox.classList.add('open');
+        };
+        document.querySelectorAll('.light-btn').forEach((btn) => {
+          btn.addEventListener('click', openBtn);
+        });
+        closeBtn.addEventListener('click', () => {
+          lightbox.classList.remove('open');
+          viewer.removeAttribute('src');
+        });
+        lightbox.addEventListener('click', (ev) => {
+          if (ev.target === lightbox) {
+            lightbox.classList.remove('open');
+            viewer.removeAttribute('src');
+          }
+        });
+        window.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Escape' && lightbox.classList.contains('open')) {
+            lightbox.classList.remove('open');
+            viewer.removeAttribute('src');
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
+
+
