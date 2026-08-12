@@ -1,36 +1,53 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Review Pilot Documentation</title>
-    <meta
-      name="description"
-      content="Landing page for Review Pilot extension documentation."
-    />
+    <meta name="theme-color" content="#f5efe3" />
+    <title>旅途拾光 · 静态页面合集</title>
+    <meta name="description" content="收藏旅途灵感、行程攻略与各类静态 HTML 页面。" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="container">
-      <header>
-        <h1>Review Pilot Documentation</h1>
-        <p>AI-assisted code review for VS Code, built with strict JSON review contracts.</p>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero__eyebrow"><span aria-hidden="true">✦</span> TRAVEL COLLECTION</div>
+        <h1>旅途拾光</h1>
+        <p>把每一次出发，整理成随时可以翻阅的风景。</p>
+        <div class="hero__route" aria-hidden="true"><span></span><span></span><span></span></div>
       </header>
 
-      <section>
-        <h2>Documentation Pages</h2>
-        <ul>
-          <!-- GENERATED_DOC_LINKS -->
-        </ul>
-      </section>
+      <main class="content" aria-label="页面导航">
+        <section class="collection collection--guide">
+          <div class="collection__heading">
+            <div class="collection__icon" aria-hidden="true">⌖</div>
+            <div>
+              <p class="collection__kicker">GUIDES</p>
+              <h2>站点页面</h2>
+              <p class="collection__intro">本站整理发布的内容与说明。</p>
+            </div>
+          </div>
+          <ul class="link-grid">
+            <!-- GENERATED_DOC_LINKS -->
+          </ul>
+        </section>
 
-      <section>
-        <h2>HTML Pages</h2>
-        <ul>
-          <!-- GENERATED_IMPORT_LINKS -->
-        </ul>
-      </section>
-    </main>
+        <section class="collection collection--journey">
+          <div class="collection__heading">
+            <div class="collection__icon" aria-hidden="true">↗</div>
+            <div>
+              <p class="collection__kicker">JOURNEYS</p>
+              <h2>行程与作品</h2>
+              <p class="collection__intro">收录的行程攻略与独立 HTML 页面。</p>
+            </div>
+          </div>
+          <ul class="link-grid">
+            <!-- GENERATED_IMPORT_LINKS -->
+          </ul>
+        </section>
+      </main>
+
+      <footer><span>愿每段旅程都有迹可循</span><span class="footer__mark" aria-hidden="true">✦</span></footer>
+    </div>
   </body>
 </html>
-

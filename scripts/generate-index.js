@@ -20,7 +20,7 @@ function escapeHtml(value) {
 
 function buildLinkList(dir, linkPrefix) {
   if (!fs.existsSync(dir)) {
-    return '<li><span>暂无页面</span></li>';
+    return "<li><span>暂无页面</span></li>";
   }
 
   const files = fs
@@ -31,7 +31,7 @@ function buildLinkList(dir, linkPrefix) {
     .filter((name) => name !== "index.html");
 
   if (files.length === 0) {
-    return '<li><span>暂无页面</span></li>';
+    return "<li><span>暂无页面</span></li>";
   }
 
   return files
@@ -48,10 +48,15 @@ function main() {
   const docsSection = buildLinkList(path.join(siteDir, "pages"), "pages");
   const importedSection = buildLinkList(path.join(siteDir, "imported"), "imported");
 
+  if (!template.includes(docLinksMarker) || !template.includes(importLinksMarker)) {
+    throw new Error("Index template is missing generated link markers.");
+  }
+
   const output = template
     .replace(docLinksMarker, docsSection)
     .replace(importLinksMarker, importedSection);
 
+  fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(outIndex, output, "utf8");
 }
 
